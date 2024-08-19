@@ -47,9 +47,9 @@ class _FormPageState extends State<FormPage> {
       'skills': _skills,
       'interests': _interests,
       if (_profilePic != null)
-        'profile_pic': await MultipartFile.fromFile(
+        'profilepic': await MultipartFile.fromFile(
           _profilePic!.path,
-          filename: _profilePic!.path.split('/').last,
+          filename: _profilePic!.path.split('/').last,// Specify the correct media type
         ),
     });
 
@@ -61,7 +61,7 @@ class _FormPageState extends State<FormPage> {
       'section': _section,
       'skills': _skills,
       'interests': _interests,
-      if (_profilePic != null) 'profile_pic': _profilePic!.path,
+      if (_profilePic != null) 'profilePic': _profilePic!.path,
     };
     print(formDataMap);
 
