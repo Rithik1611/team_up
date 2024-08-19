@@ -4,6 +4,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:team_up/api/dio_service.dart';
+import 'package:team_up/models/student.dart';
+import 'package:team_up/view/next_page.dart';
 
 class FormPage extends StatefulWidget {
   const FormPage({super.key});
@@ -38,44 +40,57 @@ class _FormPageState extends State<FormPage> {
   }
 
   Future<void> _sendData() async {
-    // Prepare the form data
-    FormData formData = FormData.fromMap({
-      'name': _name,
-      'year': _year,
-      'department': _department,
-      'section': _section,
-      'skills': _skills,
-      'interests': _interests,
-      if (_profilePic != null)
-        'profilepic': await MultipartFile.fromFile(
-          _profilePic!.path,
-          filename: _profilePic!.path.split('/').last,// Specify the correct media type
-        ),
-    });
+  // Prepare the form data
+  FormData formData = FormData.fromMap({
+    'name': _name,
+    'year': _year,
+    'department': _department,
+    'section': _section,
+    'skills': _skills,
+    'interests': _interests,
+    if (_profilePic != null)
+      'profilepic': await MultipartFile.fromFile(
+        _profilePic!.path,
+        filename: _profilePic!.path.split('/').last,
+      ),
+  });
 
-    // Print the contents of FormData in an object-like format
-    Map<String, dynamic> formDataMap = {
-      'name': _name,
-      'year': _year,
-      'department': _department,
-      'section': _section,
-      'skills': _skills,
-      'interests': _interests,
-      if (_profilePic != null) 'profilePic': _profilePic!.path,
-    };
-    print(formDataMap);
-
+  try {
     // Send POST request using Dio
     Response response =
         await _dioService.postRequest('/user/updateProfile', formData);
-    print(response);
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 && response.data['message'] == 'Profile updated successfully') {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Data submitted successfully')),
+        const SnackBar(content: Text('Profile updated successfully')),
+      );
+
+      // Create a Student object with the entered data
+      Student student = Student(
+        name: _name,
+        year: _year,
+        department: _department,
+        section: _section,
+        skills: _skills,
+        interests: _interests,
+        profilePic: _profilePic ?? File(''), // Use a default empty file if no profile pic
+      );
+
+      // Navigate to NextPage and pass the Student object
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => NextPage(student: student),
+        ),
       );
     }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Failed to update profile: $e')),
+    );
   }
+}
+
 
   Future<void> _fetchData() async {
     try {
