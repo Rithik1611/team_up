@@ -40,57 +40,58 @@ class _FormPageState extends State<FormPage> {
   }
 
   Future<void> _sendData() async {
-  // Prepare the form data
-  FormData formData = FormData.fromMap({
-    'name': _name,
-    'year': _year,
-    'department': _department,
-    'section': _section,
-    'skills': _skills,
-    'interests': _interests,
-    if (_profilePic != null)
-      'profilepic': await MultipartFile.fromFile(
-        _profilePic!.path,
-        filename: _profilePic!.path.split('/').last,
-      ),
-  });
-
-  try {
-    // Send POST request using Dio
-    Response response =
-        await _dioService.postRequest('/user/updateProfile', formData);
-
-    if (response.statusCode == 200 && response.data['message'] == 'Profile updated successfully') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile updated successfully')),
-      );
-
-      // Create a Student object with the entered data
-      Student student = Student(
-        name: _name,
-        year: _year,
-        department: _department,
-        section: _section,
-        skills: _skills,
-        interests: _interests,
-        profilePic: _profilePic ?? File(''), // Use a default empty file if no profile pic
-      );
-
-      // Navigate to NextPage and pass the Student object
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => NextPage(student: student),
+    // Prepare the form data
+    FormData formData = FormData.fromMap({
+      'name': _name,
+      'year': _year,
+      'department': _department,
+      'section': _section,
+      'skills': _skills,
+      'interests': _interests,
+      if (_profilePic != null)
+        'profilepic': await MultipartFile.fromFile(
+          _profilePic!.path,
+          filename: _profilePic!.path.split('/').last,
         ),
+    });
+
+    try {
+      // Send POST request using Dio
+      Response response =
+          await _dioService.postRequest('/user/updateProfile', formData);
+
+      if (response.statusCode == 200 &&
+          response.data['message'] == 'Profile updated successfully') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Profile updated successfully')),
+        );
+
+        // Create a Student object with the entered data
+        Student student = Student(
+          name: _name,
+          year: _year,
+          department: _department,
+          section: _section,
+          skills: _skills,
+          interests: _interests,
+          profilePic: _profilePic ??
+              File(''), // Use a default empty file if no profile pic
+        );
+
+        // Navigate to NextPage and pass the Student object
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => NextPage(student: student),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update profile: $e')),
       );
     }
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Failed to update profile: $e')),
-    );
   }
-}
-
 
   Future<void> _fetchData() async {
     try {
@@ -197,7 +198,7 @@ class _FormPageState extends State<FormPage> {
                 }).toList(),
                 ElevatedButton(
                   style: ButtonStyle(
-                      padding: MaterialStateProperty.all(
+                      padding: WidgetStateProperty.all(
                           EdgeInsets.symmetric(horizontal: 30))),
                   onPressed: () => setState(() {
                     _skills.add('');
