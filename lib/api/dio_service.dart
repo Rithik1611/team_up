@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:team_up/api/auth_model.dart';
 
 class DioService {
   final Dio _dio = Dio()
@@ -14,9 +15,18 @@ class DioService {
         'https://kcgteamupserver-production.up.railway.app/api';
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
-        // Add Authorization token to the headers
-        options.headers['Authorization'] =
-            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQXN3aW4iLCJpZCI6IjY2YmVlZmQzNDJhOTE4Yzg0YWNkOTk3NyIsInJvbGUiOiJzdHVkZW50IiwiaWF0IjoxNzIzNzg5MjY3LCJleHAiOjE3MjYzODEyNjd9.n9pmbrvLlYd9HVl6vyCKulyKO7VpPr5WDHQEaY6o-ZE';
+        // Fetch the token from Sembast database
+        final authModel = AuthModel();
+        final token = await authModel.getToken();
+
+        if (token != null) {
+          // Add Authorization token to the headers
+          options.headers['Authorization'] = 'Bearer $token';
+          print('Authorization Header: Bearer $token');
+        } else {
+          print('No token found');
+        }
+
         return handler.next(options); // Continue with the request
       },
     ));
