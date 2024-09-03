@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:dropdown_search/dropdown_search.dart'; // Import the dropdown_search package
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:team_up/api/dio_service.dart';
@@ -18,8 +19,68 @@ class _FormPageState extends State<FormPage> {
   int currentStep = 0;
   final _formKey = GlobalKey<FormState>();
 
+  final List<String> _predefinedSkills = [
+    'Flutter',
+    'Dart',
+    'JavaScript',
+    'Python',
+    'Java',
+    'C++',
+    'C#',
+    'HTML',
+    'CSS',
+    'Kotlin',
+    'Swift',
+    'Ruby',
+    'PHP',
+    'SQL',
+    'R',
+    'Go',
+    'Rust',
+    'Scala',
+    'TypeScript',
+    'Objective-C',
+    'MATLAB',
+    'Perl',
+    'VBA',
+    'Shell Scripting',
+    'Node.js',
+    'React',
+    'Angular',
+    'Vue.js',
+    'Spring Boot',
+    'Django',
+    'Flask',
+    'Express.js',
+    'ASP.NET',
+    'Laravel',
+    'TensorFlow',
+    'PyTorch',
+    'Keras',
+    'OpenCV',
+    'Hadoop',
+    'Spark',
+    'Unity',
+    'Unreal Engine',
+    'Blender',
+    'AutoCAD',
+    'Machine Learning',
+    'Data Science',
+    'Cloud Computing',
+    'AWS',
+    'Azure',
+    'Google Cloud',
+    'Docker',
+    'Kubernetes',
+    'DevOps',
+    'CI/CD',
+    'Blockchain',
+    'Cybersecurity',
+    'Agile Methodologies',
+  ];
+
   String _name = '';
-  String _year = '';
+  String _year = ''; // Initialize as an empty string
   String _department = '';
   String _section = '';
   List<String> _skills = [];
@@ -28,6 +89,13 @@ class _FormPageState extends State<FormPage> {
 
   final ImagePicker _picker = ImagePicker();
   final DioService _dioService = DioService(); // Instantiate DioService
+
+  @override
+  void initState() {
+    super.initState();
+    // Ensure _year is valid or reset it to an empty string if not
+    _year = ['First', 'Second', 'Third', 'Fourth'].contains(_year) ? _year : '';
+  }
 
   Future<void> _pickProfilePic() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
@@ -40,7 +108,6 @@ class _FormPageState extends State<FormPage> {
   }
 
   Future<void> _sendData() async {
-    // Prepare the form data
     FormData formData = FormData.fromMap({
       'name': _name,
       'year': _year,
@@ -56,7 +123,6 @@ class _FormPageState extends State<FormPage> {
     });
 
     try {
-      // Send POST request using Dio
       Response response =
           await _dioService.postRequest('/user/updateProfile', formData);
 
@@ -66,7 +132,6 @@ class _FormPageState extends State<FormPage> {
           const SnackBar(content: Text('Profile updated successfully')),
         );
 
-        // Create a Student object with the entered data
         Student student = Student(
           name: _name,
           year: _year,
@@ -74,11 +139,9 @@ class _FormPageState extends State<FormPage> {
           section: _section,
           skills: _skills,
           interests: _interests,
-          profilePic: _profilePic ??
-              File(''), // Use a default empty file if no profile pic
+          profilePic: _profilePic ?? File(''),
         );
 
-        // Navigate to NextPage and pass the Student object
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -89,21 +152,6 @@ class _FormPageState extends State<FormPage> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to update profile: $e')),
-      );
-    }
-  }
-
-  Future<void> _fetchData() async {
-    try {
-      // Send GET request using Dio
-      Response response = await _dioService.getRequest('/fetchData');
-      if (response.statusCode == 200) {
-        // Handle the fetched data
-        print(response.data); // Example: print fetched data to console
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to fetch data: $e')),
       );
     }
   }
@@ -154,12 +202,26 @@ class _FormPageState extends State<FormPage> {
                       return null;
                     },
                   ),
-                  TextFormField(
-                    onChanged: (value) => _year = value,
-                    decoration: const InputDecoration(labelText: 'Year'),
+                  DropdownButtonFormField<String>(
+                    value: _year.isNotEmpty ? _year : null,
+                    items: ['First', 'Second', 'Third', 'Fourth']
+                        .map((String year) {
+                      return DropdownMenuItem<String>(
+                        value: year,
+                        child: Text(year),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _year = value!;
+                      });
+                    },
+                    decoration: const InputDecoration(
+                      labelText: 'Year',
+                    ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your year';
+                        return 'Please select your year';
                       }
                       return null;
                     },
@@ -170,20 +232,29 @@ class _FormPageState extends State<FormPage> {
           ),
           Step(
             isActive: currentStep >= 1,
-            title: const Text("Skills Set"),
+            title: const Text("Skills & Interests"),
             content: Column(
               children: [
+                // Skills Section
                 ..._skills.asMap().entries.map((entry) {
                   int index = entry.key;
                   return Row(
                     children: [
                       Expanded(
-                        child: TextFormField(
+                        child: DropdownSearch<String>(
+                          items: _predefinedSkills,
+                          selectedItem:
+                              _skills[index].isEmpty ? null : _skills[index],
                           onChanged: (value) => setState(() {
-                            _skills[index] = value;
+                            _skills[index] = value ?? '';
                           }),
-                          decoration: InputDecoration(
-                            labelText: 'Skill ${index + 1}',
+                          dropdownDecoratorProps: DropDownDecoratorProps(
+                            dropdownSearchDecoration: InputDecoration(
+                              labelText: 'Skill ${index + 1}',
+                            ),
+                          ),
+                          popupProps: const PopupProps.menu(
+                            showSearchBox: true,
                           ),
                         ),
                       ),
@@ -197,28 +268,38 @@ class _FormPageState extends State<FormPage> {
                   );
                 }).toList(),
                 ElevatedButton(
-                  style: ButtonStyle(
-                      padding: WidgetStateProperty.all(
-                          EdgeInsets.symmetric(horizontal: 30))),
                   onPressed: () => setState(() {
-                    _skills.add('');
+                    _skills.add(''); // Add an empty entry for a new skill
                   }),
                   child: const Text('Add Skill'),
                 ),
-                SizedBox(
-                  height: 10,
-                ),
+
+                const SizedBox(
+                    height:
+                        20), // Add some spacing between skills and interests
+
+                // Interests Section
                 ..._interests.asMap().entries.map((entry) {
                   int index = entry.key;
                   return Row(
                     children: [
                       Expanded(
-                        child: TextFormField(
+                        child: DropdownSearch<String>(
+                          items:
+                              _predefinedSkills, // Use the same predefined skills list
+                          selectedItem: _interests[index].isEmpty
+                              ? null
+                              : _interests[index],
                           onChanged: (value) => setState(() {
-                            _interests[index] = value;
+                            _interests[index] = value ?? '';
                           }),
-                          decoration: InputDecoration(
-                            labelText: 'Interest ${index + 1}',
+                          dropdownDecoratorProps: DropDownDecoratorProps(
+                            dropdownSearchDecoration: InputDecoration(
+                              labelText: 'Interest ${index + 1}',
+                            ),
+                          ),
+                          popupProps: const PopupProps.menu(
+                            showSearchBox: true,
                           ),
                         ),
                       ),
@@ -233,7 +314,7 @@ class _FormPageState extends State<FormPage> {
                 }).toList(),
                 ElevatedButton(
                   onPressed: () => setState(() {
-                    _interests.add('');
+                    _interests.add(''); // Add an empty entry for a new interest
                   }),
                   child: const Text('Add Interest'),
                 ),
@@ -268,13 +349,18 @@ class _FormPageState extends State<FormPage> {
             }
           }
         },
-        onStepCancel: currentStep == 0
-            ? null
-            : () {
-                setState(() {
-                  currentStep -= 1;
-                });
-              },
+        onStepCancel: () {
+          if (currentStep > 0) {
+            setState(() {
+              currentStep -= 1;
+            });
+          }
+        },
+        onStepTapped: (step) {
+          setState(() {
+            currentStep = step;
+          });
+        },
       ),
     );
   }

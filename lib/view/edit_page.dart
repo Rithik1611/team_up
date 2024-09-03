@@ -1,7 +1,9 @@
 import 'dart:io';
+
+import 'package:dio/dio.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:dio/dio.dart';
 import 'package:team_up/api/dio_service.dart';
 import 'package:team_up/models/student.dart';
 import 'package:team_up/view/next_page.dart'; // Adjust the import as necessary
@@ -24,10 +26,69 @@ class _EditPageState extends State<EditPage> {
   late List<String> _interests;
   File? _newProfilePic;
 
-  final TextEditingController _skillController = TextEditingController();
-  final TextEditingController _interestController = TextEditingController();
   final DioService _dioService =
       DioService(); // Assuming you have a DioService for API requests
+
+  // Predefined lists of skills and interests
+  final List<String> _allSkills = [
+    'Flutter',
+    'Dart',
+    'JavaScript',
+    'Python',
+    'Java',
+    'C++',
+    'C#',
+    'HTML',
+    'CSS',
+    'Kotlin',
+    'Swift',
+    'Ruby',
+    'PHP',
+    'SQL',
+    'R',
+    'Go',
+    'Rust',
+    'Scala',
+    'TypeScript',
+    'Objective-C',
+    'MATLAB',
+    'Perl',
+    'VBA',
+    'Shell Scripting',
+    'Node.js',
+    'React',
+    'Angular',
+    'Vue.js',
+    'Spring Boot',
+    'Django',
+    'Flask',
+    'Express.js',
+    'ASP.NET',
+    'Laravel',
+    'TensorFlow',
+    'PyTorch',
+    'Keras',
+    'OpenCV',
+    'Hadoop',
+    'Spark',
+    'Unity',
+    'Unreal Engine',
+    'Blender',
+    'AutoCAD',
+    'Machine Learning',
+    'Data Science',
+    'Cloud Computing',
+    'AWS',
+    'Azure',
+    'Google Cloud',
+    'Docker',
+    'Kubernetes',
+    'DevOps',
+    'CI/CD',
+    'Blockchain',
+    'Cybersecurity',
+    'Agile Methodologies',
+  ];
 
   @override
   void initState() {
@@ -48,33 +109,6 @@ class _EditPageState extends State<EditPage> {
         _newProfilePic = File(pickedFile.path);
       });
     }
-  }
-
-  void _addSkill(String skill) {
-    setState(() {
-      _skills.add(skill);
-    });
-    _skillController.clear(); // Clear the text field after adding the skill
-  }
-
-  void _removeSkill(String skill) {
-    setState(() {
-      _skills.remove(skill);
-    });
-  }
-
-  void _addInterest(String interest) {
-    setState(() {
-      _interests.add(interest);
-    });
-    _interestController
-        .clear(); // Clear the text field after adding the interest
-  }
-
-  void _removeInterest(String interest) {
-    setState(() {
-      _interests.remove(interest);
-    });
   }
 
   Future<void> _sendData() async {
@@ -162,11 +196,27 @@ class _EditPageState extends State<EditPage> {
               enabled: false, // This makes the TextFormField read-only
             ),
             const SizedBox(height: 20),
-            TextFormField(
-              decoration: const InputDecoration(labelText: 'Year'),
-              initialValue: _year,
+            DropdownButtonFormField<String>(
+              value: _year.isNotEmpty ? _year : null,
+              items: ['First', 'Second', 'Third', 'Fourth'].map((String year) {
+                return DropdownMenuItem<String>(
+                  value: year,
+                  child: Text(year),
+                );
+              }).toList(),
               onChanged: (value) {
-                _year = value;
+                setState(() {
+                  _year = value!;
+                });
+              },
+              decoration: const InputDecoration(
+                labelText: 'Year',
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please select your year';
+                }
+                return null;
               },
             ),
             const SizedBox(height: 20),
@@ -198,28 +248,17 @@ class _EditPageState extends State<EditPage> {
               ),
             ),
             const SizedBox(height: 10),
-            Wrap(
-              spacing: 8.0,
-              children: _skills
-                  .map((skill) => Chip(
-                        label: Text(skill),
-                        deleteIcon: const Icon(Icons.cancel),
-                        onDeleted: () => _removeSkill(skill),
-                      ))
-                  .toList(),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: _skillController,
-              decoration: const InputDecoration(
-                labelText: 'Add a new skill',
-                suffixIcon: Icon(Icons.add),
+            DropdownSearch<String>.multiSelection(
+              items: _allSkills,
+              popupProps: PopupPropsMultiSelection.dialog(
+                showSearchBox: true,
               ),
-              onSubmitted: (value) {
-                if (value.isNotEmpty) {
-                  _addSkill(value);
-                }
+              onChanged: (value) {
+                setState(() {
+                  _skills = value;
+                });
               },
+              selectedItems: _skills,
             ),
             const SizedBox(height: 20),
             const Align(
@@ -233,28 +272,17 @@ class _EditPageState extends State<EditPage> {
               ),
             ),
             const SizedBox(height: 10),
-            Wrap(
-              spacing: 8.0,
-              children: _interests
-                  .map((interest) => Chip(
-                        label: Text(interest),
-                        deleteIcon: const Icon(Icons.cancel),
-                        onDeleted: () => _removeInterest(interest),
-                      ))
-                  .toList(),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: _interestController,
-              decoration: const InputDecoration(
-                labelText: 'Add a new interest',
-                suffixIcon: Icon(Icons.add),
+            DropdownSearch<String>.multiSelection(
+              items: _allSkills,
+              popupProps: PopupPropsMultiSelection.dialog(
+                showSearchBox: true,
               ),
-              onSubmitted: (value) {
-                if (value.isNotEmpty) {
-                  _addInterest(value);
-                }
+              onChanged: (value) {
+                setState(() {
+                  _interests = value;
+                });
               },
+              selectedItems: _interests,
             ),
             const SizedBox(height: 20),
             ElevatedButton(
