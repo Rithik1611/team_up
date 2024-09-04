@@ -64,9 +64,9 @@ class _NextPageState extends State<NextPage> {
     return Container(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: _pageIndex == index ? Color.fromARGB(255, 255, 255, 255) : Colors.transparent,
+        color: _pageIndex == index ? const Color.fromARGB(255, 255, 255, 255) : Colors.transparent,
       ),
-      padding: EdgeInsets.all(10.0),
+      padding: const EdgeInsets.all(10.0),
       child: Icon(
         icon,
         size: 24,
