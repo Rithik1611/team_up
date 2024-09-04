@@ -14,6 +14,7 @@ class _SignupPageState extends State<SignupPage> {
   String _name = '';
   String _email = '';
   String _password = '';
+  bool _isPasswordVisible = false;
 
   final AuthViewModel _authViewModel = AuthViewModel();
 
@@ -103,8 +104,21 @@ class _SignupPageState extends State<SignupPage> {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _isPasswordVisible
+                        ? Icons.visibility
+                        : Icons.visibility_off,
+                    color: Colors.black,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _isPasswordVisible = !_isPasswordVisible;
+                    });
+                  },
+                ),
               ),
-              obscureText: true,
+              obscureText: !_isPasswordVisible,
               onChanged: (value) {
                 setState(() {
                   _password = value;
