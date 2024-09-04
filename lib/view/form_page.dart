@@ -161,9 +161,55 @@ class _FormPageState extends State<FormPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Getting Started!"),
+        backgroundColor: Color.fromARGB(255, 49, 0, 128),
       ),
       body: Stepper(
         type: StepperType.vertical,
+        currentStep: currentStep,
+        onStepContinue: () {
+          if (_formKey.currentState?.validate() ?? false) {
+            if (currentStep < 2) {
+              setState(() {
+                currentStep += 1;
+              });
+            } else {
+              _sendData();
+            }
+          }
+        },
+        onStepCancel: () {
+          if (currentStep > 0) {
+            setState(() {
+              currentStep -= 1;
+            });
+          }
+        },
+        onStepTapped: (step) {
+          setState(() {
+            currentStep = step;
+          });
+        },
+        controlsBuilder: (BuildContext context, ControlsDetails details) {
+          return Row(
+            children: <Widget>[
+              ElevatedButton(
+                onPressed: details.onStepContinue,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color.fromARGB(255, 49, 0, 128), // Button color
+                ),
+                child: const Text('Continue'),
+              ),
+              if (currentStep > 0)
+                TextButton(
+                  onPressed: details.onStepCancel,
+                  style: TextButton.styleFrom(
+                    foregroundColor: Color.fromARGB(255, 49, 0, 128), // Cancel button color
+                  ),
+                  child: const Text('Cancel'),
+                ),
+            ],
+          );
+        },
         steps: [
           Step(
             isActive: currentStep >= 0,
@@ -271,6 +317,9 @@ class _FormPageState extends State<FormPage> {
                   onPressed: () => setState(() {
                     _skills.add(''); // Add an empty entry for a new skill
                   }),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 49, 0, 128), // Button color
+                  ),
                   child: const Text('Add Skill'),
                 ),
 
@@ -285,8 +334,7 @@ class _FormPageState extends State<FormPage> {
                     children: [
                       Expanded(
                         child: DropdownSearch<String>(
-                          items:
-                              _predefinedSkills, // Use the same predefined skills list
+                          items: _predefinedSkills,
                           selectedItem: _interests[index].isEmpty
                               ? null
                               : _interests[index],
@@ -316,6 +364,9 @@ class _FormPageState extends State<FormPage> {
                   onPressed: () => setState(() {
                     _interests.add(''); // Add an empty entry for a new interest
                   }),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 49, 0, 128), // Button color
+                  ),
                   child: const Text('Add Interest'),
                 ),
               ],
@@ -328,6 +379,9 @@ class _FormPageState extends State<FormPage> {
               children: [
                 ElevatedButton(
                   onPressed: _pickProfilePic,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 49, 0, 128), // Button color
+                  ),
                   child: const Text('Pick Profile Picture'),
                 ),
                 if (_profilePic != null) ...[
@@ -337,30 +391,6 @@ class _FormPageState extends State<FormPage> {
             ),
           ),
         ],
-        currentStep: currentStep,
-        onStepContinue: () {
-          if (_formKey.currentState?.validate() ?? false) {
-            if (currentStep < 2) {
-              setState(() {
-                currentStep += 1;
-              });
-            } else {
-              _sendData();
-            }
-          }
-        },
-        onStepCancel: () {
-          if (currentStep > 0) {
-            setState(() {
-              currentStep -= 1;
-            });
-          }
-        },
-        onStepTapped: (step) {
-          setState(() {
-            currentStep = step;
-          });
-        },
       ),
     );
   }

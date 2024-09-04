@@ -22,6 +22,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(appBar: AppBar(automaticallyImplyLeading: false,
+    backgroundColor: Color.fromARGB(255, 49, 0, 128),
         title: const Text("Profile"),
         actions: [
           IconButton(
@@ -105,7 +106,7 @@ class _ProfilePageState extends State<ProfilePage> {
               children: _student.skills
                   .map((skill) => Chip(
                       label: Text(skill, style: TextStyle(color: Colors.white)),
-                      backgroundColor: Color.fromARGB(200, 103, 65, 136)))
+                      backgroundColor: Color.fromARGB(255, 49, 0, 128)))
                   .toList(),
             ),
             SizedBox(height: 20),
@@ -126,7 +127,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   .map((interest) => Chip(
                       label:
                           Text(interest, style: TextStyle(color: Colors.white)),
-                      backgroundColor: Color.fromARGB(200, 103, 65, 136)))
+                      backgroundColor:  Color.fromARGB(255, 49, 0, 128)))
                   .toList(),
             ),
             SizedBox(height: 20),
