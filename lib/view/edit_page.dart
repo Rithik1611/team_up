@@ -169,7 +169,7 @@ class _EditPageState extends State<EditPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Edit Details"),
-        backgroundColor:  Color.fromARGB(255, 49, 0, 128),
+        backgroundColor:  const Color.fromARGB(255, 49, 0, 128),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -251,7 +251,7 @@ class _EditPageState extends State<EditPage> {
             const SizedBox(height: 10),
             DropdownSearch<String>.multiSelection(
               items: _allSkills,
-              popupProps: PopupPropsMultiSelection.dialog(
+              popupProps: const PopupPropsMultiSelection.dialog(
                 showSearchBox: true,
               ),
               onChanged: (value) {
@@ -275,7 +275,7 @@ class _EditPageState extends State<EditPage> {
             const SizedBox(height: 10),
             DropdownSearch<String>.multiSelection(
               items: _allSkills,
-              popupProps: PopupPropsMultiSelection.dialog(
+              popupProps: const PopupPropsMultiSelection.dialog(
                 showSearchBox: true,
               ),
               onChanged: (value) {

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:team_up/models/auth_remote.dart';
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -19,15 +21,15 @@ class _LoginPageState extends State<LoginPage> {
     );
 
     if (isSuccess) {
-      await Future.delayed(Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 500));
       final token = await _authViewModel.getToken();
       print('Token after login: $token');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login successful')),
+        const SnackBar(content: Text('Login successful')),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login failed')),
+        const SnackBar(content: Text('Login failed')),
       );
     }
   }
@@ -41,17 +43,17 @@ class _LoginPageState extends State<LoginPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
+            const Text(
               'WELCOME BACK.',
               style: TextStyle(
-                  fontSize: 32, color: const Color.fromARGB(255, 0, 0, 0)),
+                  fontSize: 32, color: Color.fromARGB(255, 0, 0, 0)),
             ),
-            SizedBox(height: 32),
+            const SizedBox(height: 32),
             TextField(
               decoration: InputDecoration(
                 labelText: 'Email',
                 labelStyle:
-                    TextStyle(color: Colors.black),
+                    const TextStyle(color: Colors.black),
                 filled: true,
                 fillColor: Colors.white10,
                 border: OutlineInputBorder(
@@ -64,12 +66,12 @@ class _LoginPageState extends State<LoginPage> {
                 });
               },
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             TextField(
               decoration: InputDecoration(
                 labelText: 'Password',
                 labelStyle:
-                    TextStyle(color: Colors.black),
+                    const TextStyle(color: Colors.black),
                 filled: true,
                 fillColor: Colors.white10,
                 border: OutlineInputBorder(
@@ -83,17 +85,17 @@ class _LoginPageState extends State<LoginPage> {
                 });
               },
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _login,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepPurple,
-                minimumSize: Size(double.infinity, 50),
+                minimumSize: const Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: Text('LOG IN', style: TextStyle(color: const Color.fromARGB(255, 255, 255, 255), fontSize: 16)),
+              child: const Text('LOG IN', style: TextStyle(color: Color.fromARGB(255, 255, 255, 255), fontSize: 16)),
             ),
           ],
         ),

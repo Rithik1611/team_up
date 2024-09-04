@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
 
 class SearchPage extends StatelessWidget {
+  const SearchPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(automaticallyImplyLeading: false,
-      backgroundColor: Color.fromARGB(255, 49, 0, 128),
-        title: Text('Search'),
+      backgroundColor: const Color.fromARGB(255, 49, 0, 128),
+        title: const Text('Search'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
+            const Text(
               'Search for something!',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            const SizedBox(height: 20),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.0),
               child: TextField(
                 decoration: InputDecoration(
                   hintText: 'Enter search term',
@@ -26,15 +28,15 @@ class SearchPage extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 // Example action: Searching
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Search initiated!')),
+                  const SnackBar(content: Text('Search initiated!')),
                 );
               },
-              child: Text('Search'),
+              child: const Text('Search'),
             ),
           ],
         ),

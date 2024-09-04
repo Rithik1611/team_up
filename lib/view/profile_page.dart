@@ -22,7 +22,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(appBar: AppBar(automaticallyImplyLeading: false,
-    backgroundColor: Color.fromARGB(255, 49, 0, 128),
+    backgroundColor: const Color.fromARGB(255, 49, 0, 128),
         title: const Text("Profile"),
         actions: [
           IconButton(
@@ -58,16 +58,16 @@ class _ProfilePageState extends State<ProfilePage> {
                   radius: 40,
                   backgroundImage: _student.profilePic.path.isNotEmpty
                       ? FileImage(_student.profilePic)
-                      : AssetImage('assets/profile_image.png') as ImageProvider,
+                      : const AssetImage('assets/profile_image.png') as ImageProvider,
                   backgroundColor: const Color.fromARGB(255, 137, 137, 137),
                 ),
-                SizedBox(width: 16),
+                const SizedBox(width: 16),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       _student.name,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
@@ -75,22 +75,22 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     Text(
                       '${_student.year} Year',
-                      style: TextStyle(fontSize: 18, color: Colors.grey),
+                      style: const TextStyle(fontSize: 18, color: Colors.grey),
                     ),
                     Text(
-                      '${_student.department}',
-                      style: TextStyle(fontSize: 18, color: Colors.grey),
+                      _student.department,
+                      style: const TextStyle(fontSize: 18, color: Colors.grey),
                     ),
                     Text(
-                      '${_student.section}',
-                      style: TextStyle(fontSize: 18, color: Colors.grey),
+                      _student.section,
+                      style: const TextStyle(fontSize: 18, color: Colors.grey),
                     ),
                   ],
                 ),
               ],
             ),
-            SizedBox(height: 20),
-            Align(
+            const SizedBox(height: 20),
+            const Align(
               alignment: Alignment.centerLeft,
               child: Text(
                 'Skill set:',
@@ -100,17 +100,17 @@ class _ProfilePageState extends State<ProfilePage> {
                     color: Colors.black),
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Wrap(
               spacing: 8.0,
               children: _student.skills
                   .map((skill) => Chip(
-                      label: Text(skill, style: TextStyle(color: Colors.white)),
-                      backgroundColor: Color.fromARGB(255, 49, 0, 128)))
+                      label: Text(skill, style: const TextStyle(color: Colors.white)),
+                      backgroundColor: const Color.fromARGB(255, 49, 0, 128)))
                   .toList(),
             ),
-            SizedBox(height: 20),
-            Align(
+            const SizedBox(height: 20),
+            const Align(
               alignment: Alignment.centerLeft,
               child: Text(
                 'Interested:',
@@ -120,17 +120,17 @@ class _ProfilePageState extends State<ProfilePage> {
                     color: Colors.black),
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Wrap(
               spacing: 8.0,
               children: _student.interests
                   .map((interest) => Chip(
                       label:
-                          Text(interest, style: TextStyle(color: Colors.white)),
-                      backgroundColor:  Color.fromARGB(255, 49, 0, 128)))
+                          Text(interest, style: const TextStyle(color: Colors.white)),
+                      backgroundColor:  const Color.fromARGB(255, 49, 0, 128)))
                   .toList(),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
           ],
         ),
       ),

@@ -83,8 +83,8 @@ class _FormPageState extends State<FormPage> {
   String _year = ''; // Initialize as an empty string
   String _department = '';
   String _section = '';
-  List<String> _skills = [];
-  List<String> _interests = [];
+  final List<String> _skills = [];
+  final List<String> _interests = [];
   File? _profilePic;
 
   final ImagePicker _picker = ImagePicker();
@@ -161,7 +161,7 @@ class _FormPageState extends State<FormPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Getting Started!"),
-        backgroundColor: Color.fromARGB(255, 49, 0, 128),
+        backgroundColor: const Color.fromARGB(255, 49, 0, 128),
       ),
       body: Stepper(
         type: StepperType.vertical,
@@ -195,7 +195,7 @@ class _FormPageState extends State<FormPage> {
               ElevatedButton(
                 onPressed: details.onStepContinue,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color.fromARGB(255, 49, 0, 128), // Button color
+                  backgroundColor: const Color.fromARGB(255, 49, 0, 128), // Button color
                 ),
                 child: const Text('Continue'),
               ),
@@ -203,7 +203,7 @@ class _FormPageState extends State<FormPage> {
                 TextButton(
                   onPressed: details.onStepCancel,
                   style: TextButton.styleFrom(
-                    foregroundColor: Color.fromARGB(255, 49, 0, 128), // Cancel button color
+                    foregroundColor: const Color.fromARGB(255, 49, 0, 128), // Cancel button color
                   ),
                   child: const Text('Cancel'),
                 ),
@@ -312,13 +312,13 @@ class _FormPageState extends State<FormPage> {
                       ),
                     ],
                   );
-                }).toList(),
+                }),
                 ElevatedButton(
                   onPressed: () => setState(() {
                     _skills.add(''); // Add an empty entry for a new skill
                   }),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(255, 49, 0, 128), // Button color
+                    backgroundColor: const Color.fromARGB(255, 49, 0, 128), // Button color
                   ),
                   child: const Text('Add Skill'),
                 ),
@@ -359,13 +359,13 @@ class _FormPageState extends State<FormPage> {
                       ),
                     ],
                   );
-                }).toList(),
+                }),
                 ElevatedButton(
                   onPressed: () => setState(() {
                     _interests.add(''); // Add an empty entry for a new interest
                   }),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(255, 49, 0, 128), // Button color
+                    backgroundColor: const Color.fromARGB(255, 49, 0, 128), // Button color
                   ),
                   child: const Text('Add Interest'),
                 ),
@@ -380,7 +380,7 @@ class _FormPageState extends State<FormPage> {
                 ElevatedButton(
                   onPressed: _pickProfilePic,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(255, 49, 0, 128), // Button color
+                    backgroundColor: const Color.fromARGB(255, 49, 0, 128), // Button color
                   ),
                   child: const Text('Pick Profile Picture'),
                 ),
