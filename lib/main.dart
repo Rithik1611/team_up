@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:team_up/app/app_pallete.dart';
-import 'package:team_up/view/auth.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:team_up/view/signup_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,10 +16,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Team Up',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: AppPallete.primary),
+        textTheme: GoogleFonts.ptMonoTextTheme(), 
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 72, 0, 136)),
         useMaterial3: false,
       ),
-      home: AuthPage(),
+      home: SignupPage(),
     );
   }
 }
