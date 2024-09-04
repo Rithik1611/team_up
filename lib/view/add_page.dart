@@ -5,6 +5,7 @@ class AddPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(automaticallyImplyLeading: false,
+      backgroundColor: Color.fromARGB(255, 49, 0, 128),
         title: Text('Add'),
       ),
       body: Center(

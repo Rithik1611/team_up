@@ -81,7 +81,8 @@ class _AuthPageState extends State<AuthPage>
     return Scaffold(
       appBar: AppBar(
         title: Text('Auth Page', style: TextStyle(color: Colors.white)),
-        backgroundColor: Theme.of(context).primaryColor,
+        
+        backgroundColor: Color.fromARGB(255, 49, 0, 128),
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: Colors.white,

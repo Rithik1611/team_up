@@ -169,6 +169,7 @@ class _EditPageState extends State<EditPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Edit Details"),
+        backgroundColor:  Color.fromARGB(255, 49, 0, 128),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
