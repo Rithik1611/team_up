@@ -38,6 +38,10 @@ dependencies:
   path_provider: ^2.1.4
   sembast: ^3.7.2
   google_fonts: ^6.2.1 # Add this line for Google Fonts dependency
+  fl_heatmap: ^0.4.5
+  getwidget: ^4.0.0
+  awesome_snackbar_content: ^0.1.4
+  flutter_heatmap_calendar: ^1.0.5
 
 dev_dependencies:
 
