@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:dropdown_search/dropdown_search.dart'; // Import the dropdown_search package
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:team_up/api/dio_service.dart';
@@ -20,63 +20,15 @@ class _FormPageState extends State<FormPage> {
   final _formKey = GlobalKey<FormState>();
 
   final List<String> _predefinedSkills = [
-    'Flutter',
-    'Dart',
-    'JavaScript',
-    'Python',
-    'Java',
-    'C++',
-    'C#',
-    'HTML',
-    'CSS',
-    'Kotlin',
-    'Swift',
-    'Ruby',
-    'PHP',
-    'SQL',
-    'R',
-    'Go',
-    'Rust',
-    'Scala',
-    'TypeScript',
-    'Objective-C',
-    'MATLAB',
-    'Perl',
-    'VBA',
-    'Shell Scripting',
-    'Node.js',
-    'React',
-    'Angular',
-    'Vue.js',
-    'Spring Boot',
-    'Django',
-    'Flask',
-    'Express.js',
-    'ASP.NET',
-    'Laravel',
-    'TensorFlow',
-    'PyTorch',
-    'Keras',
-    'OpenCV',
-    'Hadoop',
-    'Spark',
-    'Unity',
-    'Unreal Engine',
-    'Blender',
-    'AutoCAD',
-    'Machine Learning',
-    'Data Science',
-    'Cloud Computing',
-    'AWS',
-    'Azure',
-    'Google Cloud',
-    'Docker',
-    'Kubernetes',
-    'DevOps',
-    'CI/CD',
-    'Blockchain',
-    'Cybersecurity',
-    'Agile Methodologies',
+    'Flutter', 'Dart', 'JavaScript', 'Python', 'Java', 'C++', 'C#', 'HTML',
+    'CSS', 'Kotlin', 'Swift', 'Ruby', 'PHP', 'SQL', 'R', 'Go', 'Rust',
+    'Scala', 'TypeScript', 'Objective-C', 'MATLAB', 'Perl', 'VBA', 'Shell Scripting',
+    'Node.js', 'React', 'Angular', 'Vue.js', 'Spring Boot', 'Django', 'Flask',
+    'Express.js', 'ASP.NET', 'Laravel', 'TensorFlow', 'PyTorch', 'Keras',
+    'OpenCV', 'Hadoop', 'Spark', 'Unity', 'Unreal Engine', 'Blender', 'AutoCAD',
+    'Machine Learning', 'Data Science', 'Cloud Computing', 'AWS', 'Azure',
+    'Google Cloud', 'Docker', 'Kubernetes', 'DevOps', 'CI/CD', 'Blockchain',
+    'Cybersecurity', 'Agile Methodologies',
   ];
 
   String _name = '';
@@ -108,6 +60,10 @@ class _FormPageState extends State<FormPage> {
   }
 
   Future<void> _sendData() async {
+    // Remove empty skills and interests
+    _skills.removeWhere((skill) => skill.isEmpty);
+    _interests.removeWhere((interest) => interest.isEmpty);
+
     FormData formData = FormData.fromMap({
       'name': _name,
       'year': _year,
@@ -156,241 +112,263 @@ class _FormPageState extends State<FormPage> {
     }
   }
 
+  void _handleStepContinue() {
+    if (_formKey.currentState?.validate() ?? false) {
+      if (currentStep == 1) {
+        // Check if there are at least 2 skills and 2 interests
+        if (_skills.length < 2 || _interests.length < 2) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please add at least 2 skills and 2 interests.')),
+          );
+          return;
+        }
+      }
+
+      if (currentStep < 2) {
+        setState(() {
+          currentStep += 1;
+        });
+      } else {
+        _sendData();
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final stepColor = Color.fromARGB(255, 49, 0, 128);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Getting Started!"),
-        backgroundColor: const Color.fromARGB(255, 49, 0, 128),
+        backgroundColor: stepColor,
       ),
-      body: Stepper(
-        type: StepperType.vertical,
-        currentStep: currentStep,
-        onStepContinue: () {
-          if (_formKey.currentState?.validate() ?? false) {
-            if (currentStep < 2) {
+      body: Theme(
+        data: ThemeData(
+          primaryColor: stepColor,
+          hintColor: stepColor,
+          colorScheme: ColorScheme.light(primary: stepColor),
+        ),
+        child: Stepper(
+          type: StepperType.vertical,
+          currentStep: currentStep,
+          onStepContinue: _handleStepContinue,
+          onStepCancel: () {
+            if (currentStep > 0) {
               setState(() {
-                currentStep += 1;
+                currentStep -= 1;
               });
-            } else {
-              _sendData();
             }
-          }
-        },
-        onStepCancel: () {
-          if (currentStep > 0) {
+          },
+          onStepTapped: (step) {
             setState(() {
-              currentStep -= 1;
+              currentStep = step;
             });
-          }
-        },
-        onStepTapped: (step) {
-          setState(() {
-            currentStep = step;
-          });
-        },
-        controlsBuilder: (BuildContext context, ControlsDetails details) {
-          return Row(
-            children: <Widget>[
-              ElevatedButton(
-                onPressed: details.onStepContinue,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 49, 0, 128), // Button color
+          },
+          controlsBuilder: (BuildContext context, ControlsDetails details) {
+            return Row(
+              children: <Widget>[
+                ElevatedButton(
+                  onPressed: details.onStepContinue,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: stepColor, // Button color
+                  ),
+                  child: const Text('Continue', style: TextStyle(color: Colors.white)),
                 ),
-                child: const Text('Continue'),
-              ),
-              if (currentStep > 0)
-                TextButton(
-                  onPressed: details.onStepCancel,
-                  style: TextButton.styleFrom(
-                    foregroundColor: const Color.fromARGB(255, 49, 0, 128), // Cancel button color
-                  ),
-                  child: const Text('Cancel'),
-                ),
-            ],
-          );
-        },
-        steps: [
-          Step(
-            isActive: currentStep >= 0,
-            title: const Text("Personal Info"),
-            content: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  TextFormField(
-                    onChanged: (value) => _name = value,
-                    decoration: const InputDecoration(labelText: 'Name'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your name';
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFormField(
-                    onChanged: (value) => _department = value,
-                    decoration: const InputDecoration(labelText: 'Department'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your department';
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFormField(
-                    onChanged: (value) => _section = value,
-                    decoration: const InputDecoration(labelText: 'Section'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your section';
-                      }
-                      return null;
-                    },
-                  ),
-                  DropdownButtonFormField<String>(
-                    value: _year.isNotEmpty ? _year : null,
-                    items: ['First', 'Second', 'Third', 'Fourth']
-                        .map((String year) {
-                      return DropdownMenuItem<String>(
-                        value: year,
-                        child: Text(year),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _year = value!;
-                      });
-                    },
-                    decoration: const InputDecoration(
-                      labelText: 'Year',
+                if (currentStep > 0)
+                  TextButton(
+                    onPressed: details.onStepCancel,
+                    style: TextButton.styleFrom(
+                      foregroundColor: stepColor, // Cancel button color
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please select your year';
-                      }
-                      return null;
-                    },
+                    child: const Text('Cancel', style: TextStyle(color: Colors.black)),
+                  ),
+              ],
+            );
+          },
+          steps: [
+            Step(
+              isActive: currentStep >= 0,
+              title: Text("Personal Info", style: TextStyle(color: stepColor)),
+              content: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    TextFormField(
+                      onChanged: (value) => _name = value,
+                      decoration: const InputDecoration(labelText: 'Name'),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your name';
+                        }
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      onChanged: (value) => _department = value,
+                      decoration: const InputDecoration(labelText: 'Department'),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your department';
+                        }
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      onChanged: (value) => _section = value,
+                      decoration: const InputDecoration(labelText: 'Section'),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your section';
+                        }
+                        return null;
+                      },
+                    ),
+                    DropdownButtonFormField<String>(
+                      value: _year.isNotEmpty ? _year : null,
+                      items: ['First', 'Second', 'Third', 'Fourth']
+                          .map((String year) {
+                        return DropdownMenuItem<String>(
+                          value: year,
+                          child: Text(year),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _year = value!;
+                        });
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Year',
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please select your year';
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Step(
+              isActive: currentStep >= 1,
+              title: Text("Skills & Interests", style: TextStyle(color: stepColor)),
+              content: Column(
+                children: [
+                  // Skills Section
+                  ..._skills.asMap().entries.map((entry) {
+                    int index = entry.key;
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: DropdownSearch<String>(
+                            items: _predefinedSkills,
+                            selectedItem:
+                                _skills[index].isEmpty ? null : _skills[index],
+                            onChanged: (value) => setState(() {
+                              _skills[index] = value ?? '';
+                            }),
+                            dropdownDecoratorProps: DropDownDecoratorProps(
+                              dropdownSearchDecoration: InputDecoration(
+                                labelText: 'Skill ${index + 1}',
+                              ),
+                            ),
+                            popupProps: const PopupProps.menu(
+                              showSearchBox: true,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.remove),
+                          onPressed: () => setState(() {
+                            _skills.removeAt(index);
+                          }),
+                        ),
+                      ],
+                    );
+                  }),
+                  ElevatedButton(
+                    onPressed: () => setState(() {
+                      _skills.add(''); // Add an empty entry for a new skill
+                    }),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: stepColor, // Button color
+                    ),
+                    child: const Text('Add Skill',style: TextStyle(color: Colors.white)),
+                  ),
+
+                  const SizedBox(height: 20), // Add some spacing
+
+                  // Interests Section
+                  ..._interests.asMap().entries.map((entry) {
+                    int index = entry.key;
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: DropdownSearch<String>(
+                            items: _predefinedSkills,
+                            selectedItem: _interests[index].isEmpty
+                                ? null
+                                : _interests[index],
+                            onChanged: (value) => setState(() {
+                              _interests[index] = value ?? '';
+                            }),
+                            dropdownDecoratorProps: DropDownDecoratorProps(
+                              dropdownSearchDecoration: InputDecoration(
+                                labelText: 'Interest ${index + 1}',
+                              ),
+                            ),
+                            popupProps: const PopupProps.menu(
+                              showSearchBox: true,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.remove),
+                          onPressed: () => setState(() {
+                            _interests.removeAt(index);
+                          }),
+                        ),
+                      ],
+                    );
+                  }),
+                  ElevatedButton(
+                    onPressed: () => setState(() {
+                      _interests.add(''); // Add an empty entry for a new interest
+                    }),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: stepColor, // Button color
+                    ),
+                    child: const Text('Add Interest',style: TextStyle(color: Colors.white)),
                   ),
                 ],
               ),
             ),
-          ),
-          Step(
-            isActive: currentStep >= 1,
-            title: const Text("Skills & Interests"),
-            content: Column(
-              children: [
-                // Skills Section
-                ..._skills.asMap().entries.map((entry) {
-                  int index = entry.key;
-                  return Row(
-                    children: [
-                      Expanded(
-                        child: DropdownSearch<String>(
-                          items: _predefinedSkills,
-                          selectedItem:
-                              _skills[index].isEmpty ? null : _skills[index],
-                          onChanged: (value) => setState(() {
-                            _skills[index] = value ?? '';
-                          }),
-                          dropdownDecoratorProps: DropDownDecoratorProps(
-                            dropdownSearchDecoration: InputDecoration(
-                              labelText: 'Skill ${index + 1}',
-                            ),
-                          ),
-                          popupProps: const PopupProps.menu(
-                            showSearchBox: true,
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.remove),
-                        onPressed: () => setState(() {
-                          _skills.removeAt(index);
-                        }),
-                      ),
-                    ],
-                  );
-                }),
-                ElevatedButton(
-                  onPressed: () => setState(() {
-                    _skills.add(''); // Add an empty entry for a new skill
-                  }),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 49, 0, 128), // Button color
+            Step(
+              isActive: currentStep >= 2,
+              title: Text("Upload Profile Picture", style: TextStyle(color: stepColor)),
+              content: Column(
+                children: [
+                  if (_profilePic != null)
+                    Image.file(
+                      _profilePic!,
+                      width: 150,
+                      height: 150,
+                    ),
+                  ElevatedButton(
+                    onPressed: _pickProfilePic,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: stepColor, // Button color
+                    ),
+                    child: const Text('Pick Profile Picture',style: TextStyle(color: Colors.white)),
                   ),
-                  child: const Text('Add Skill'),
-                ),
-
-                const SizedBox(
-                    height:
-                        20), // Add some spacing between skills and interests
-
-                // Interests Section
-                ..._interests.asMap().entries.map((entry) {
-                  int index = entry.key;
-                  return Row(
-                    children: [
-                      Expanded(
-                        child: DropdownSearch<String>(
-                          items: _predefinedSkills,
-                          selectedItem: _interests[index].isEmpty
-                              ? null
-                              : _interests[index],
-                          onChanged: (value) => setState(() {
-                            _interests[index] = value ?? '';
-                          }),
-                          dropdownDecoratorProps: DropDownDecoratorProps(
-                            dropdownSearchDecoration: InputDecoration(
-                              labelText: 'Interest ${index + 1}',
-                            ),
-                          ),
-                          popupProps: const PopupProps.menu(
-                            showSearchBox: true,
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.remove),
-                        onPressed: () => setState(() {
-                          _interests.removeAt(index);
-                        }),
-                      ),
-                    ],
-                  );
-                }),
-                ElevatedButton(
-                  onPressed: () => setState(() {
-                    _interests.add(''); // Add an empty entry for a new interest
-                  }),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 49, 0, 128), // Button color
-                  ),
-                  child: const Text('Add Interest'),
-                ),
-              ],
-            ),
-          ),
-          Step(
-            isActive: currentStep >= 2,
-            title: const Text("Profile Picture"),
-            content: Column(
-              children: [
-                ElevatedButton(
-                  onPressed: _pickProfilePic,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 49, 0, 128), // Button color
-                  ),
-                  child: const Text('Pick Profile Picture'),
-                ),
-                if (_profilePic != null) ...[
-                  Image.file(_profilePic!, width: 100, height: 100),
                 ],
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
