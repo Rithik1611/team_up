@@ -287,8 +287,13 @@ class _EditPageState extends State<EditPage> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(
+                  const Color.fromARGB(255, 49, 0, 128),
+                ),
+              ),
               onPressed: _sendData,
-              child: const Text('Save Changes'),
+              child: const Text('Save Changes',),
             ),
           ],
         ),
