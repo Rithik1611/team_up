@@ -193,6 +193,9 @@ class _AdminControlPageState extends State<AdminControlPage> {
               SizedBox(height: 20),
               Center(
                 child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 49, 0, 128),
+                  ),
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       _postEventToServer();

@@ -45,8 +45,6 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
   }
 
   Future<void> _uploadAchievement() async {
-    
-   
     if (_imageFile == null ||
         _titleController.text.isEmpty ||
         _dateController.text.isEmpty ||
@@ -207,6 +205,9 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
               SizedBox(height: 20),
               Center(
                 child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 49, 0, 128),
+                  ),
                   onPressed: _uploadAchievement,
                   child: Text('UPLOAD'),
                 ),
