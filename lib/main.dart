@@ -16,8 +16,10 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Team Up',
       theme: ThemeData(
-        textTheme: GoogleFonts.ptMonoTextTheme(), 
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 72, 0, 136)),
+        textTheme: GoogleFonts.ptMonoTextTheme(),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color.fromARGB(255, 49, 0, 128),
+        ),
         useMaterial3: false,
       ),
       home: SignupPage(),
