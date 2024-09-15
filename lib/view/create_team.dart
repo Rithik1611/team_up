@@ -42,8 +42,8 @@ class _TeamInfoPageState extends State<TeamInfoPage> {
 
     if (token == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('Failed to retrieve token. Please log in again.')),
+        const SnackBar(
+            content: const Text('Failed to retrieve token. Please log in again.')),
       );
       return; // Exit the function if the token is null
     }
@@ -87,7 +87,7 @@ class _TeamInfoPageState extends State<TeamInfoPage> {
             );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Failed to retrieve team ID.')),
+              const SnackBar(content: Text('Failed to retrieve team ID.')),
             );
           }
         } else {
@@ -95,7 +95,7 @@ class _TeamInfoPageState extends State<TeamInfoPage> {
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to create team. Try again!')),
+          const SnackBar(content: Text('Failed to create team. Try again!')),
         );
       }
     } catch (e) {
@@ -110,7 +110,7 @@ class _TeamInfoPageState extends State<TeamInfoPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 49, 0, 128),
-        title: Text('Enter Team Info'),
+        title: const Text('Enter Team Info'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -119,7 +119,7 @@ class _TeamInfoPageState extends State<TeamInfoPage> {
           children: [
             TextField(
               controller: teamNameController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Team Name',
                 border: OutlineInputBorder(),
               ),
@@ -127,14 +127,14 @@ class _TeamInfoPageState extends State<TeamInfoPage> {
             const SizedBox(height: 16.0),
             TextField(
               controller: teamDescriptionController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Team Description',
                 border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 16.0),
             DropdownButtonFormField<int>(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Team Size',
                 border: OutlineInputBorder(),
               ),
@@ -165,14 +165,14 @@ class _TeamInfoPageState extends State<TeamInfoPage> {
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
+                      const SnackBar(
                         content: Text(
                             'Please fill out Team Name, Description, and Team Size'),
                       ),
                     );
                   }
                 },
-                child: Text('Continue to Search'),
+                child: const Text('Continue to Search'),
               ),
             ),
           ],
@@ -277,7 +277,7 @@ class _MembersSearchState extends State<MembersSearch> {
 
   void onSearchChanged(String value) {
     if (debounce?.isActive ?? false) debounce?.cancel();
-    debounce = Timer(Duration(milliseconds: 300), () {
+    debounce = Timer(const Duration(milliseconds: 300), () {
       setState(() {
         searchQuery = value;
       });
@@ -294,7 +294,7 @@ class _MembersSearchState extends State<MembersSearch> {
           selectedMembers.add(member); // Select member
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Maximum team size reached")),
+            const SnackBar(content: Text("Maximum team size reached")),
           );
         }
       }
@@ -343,10 +343,10 @@ class _MembersSearchState extends State<MembersSearch> {
               onChanged: onSearchChanged,
               decoration: InputDecoration(
                 hintText: 'Search for team members by skill or name',
-                prefixIcon: Icon(Icons.search),
+                prefixIcon: const Icon(Icons.search),
                 suffixIcon: searchQuery.isNotEmpty
                     ? IconButton(
-                        icon: Icon(Icons.close),
+                        icon: const Icon(Icons.close),
                         onPressed: () {
                           setState(() {
                             searchQuery = '';
@@ -509,7 +509,7 @@ class _SelectedMembersPageState extends State<SelectedMembersPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 49, 0, 128),
-        title: Text('Create Team'),
+        title: const Text('Create Team'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -519,7 +519,7 @@ class _SelectedMembersPageState extends State<SelectedMembersPage> {
             // Display Team Name and Description
             Text(
               'Team Name: ${widget.teamName}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -535,7 +535,7 @@ class _SelectedMembersPageState extends State<SelectedMembersPage> {
             const SizedBox(height: 16.0),
 
             // Selected Members Section
-            Text(
+            const Text(
               'Selected Members (including you):',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
@@ -576,7 +576,7 @@ class _SelectedMembersPageState extends State<SelectedMembersPage> {
                     );
                   }
                 },
-                child: Text('Confirm and Create Team'),
+                child: const Text('Confirm and Create Team'),
               ),
             ),
           ],
