@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:team_up/view/calendar_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -219,19 +220,4 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class CalendarPage extends StatelessWidget {
-  const CalendarPage({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 49, 0, 128),
-        title: const Text('Calendar Page'),
-      ),
-      body: const Center(
-        child: Text('Calendar Page Content'),
-      ),
-    );
-  }
-}
