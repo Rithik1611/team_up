@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -23,13 +23,20 @@ class _HomePageState extends State<HomePage> {
     Dio dio = Dio();
 
     try {
-      final response = await dio.get('https://66e6c57517055714e58a7cc9.mockapi.io/api/v1/events');
+      final response = await dio
+          .get('https://66e6c57517055714e58a7cc9.mockapi.io/api/v1/events');
+
+      if (!mounted) return; // Check if the widget is still in the tree
+
       setState(() {
         events = response.data;
         isLoading = false; // Set loading to false once data is fetched
       });
     } catch (e) {
       print('Failed to load events: $e');
+
+      if (!mounted) return; // Check if the widget is still in the tree
+
       setState(() {
         isLoading = false; // Stop loading even if there is an error
       });
@@ -45,18 +52,18 @@ class _HomePageState extends State<HomePage> {
         title: const Text('Home'),
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator()) // Loading indicator
+          ? const Center(
+              child: CircularProgressIndicator()) // Loading indicator
           : Column(
               children: [
                 // Reserved space for the top section (Teams & Calendar)
                 const Padding(
                   padding: EdgeInsets.all(16.0),
-                  
                   child: Column(
-                    
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(height: 100), // Additional spacing for aesthetics
+                      SizedBox(
+                          height: 100), // Additional spacing for aesthetics
                       Text(
                         'Teams Section',
                         style: TextStyle(
@@ -95,7 +102,8 @@ class _HomePageState extends State<HomePage> {
                       ? const Center(
                           child: Text(
                             'No upcoming events',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                         )
                       : ListView.builder(
@@ -104,16 +112,26 @@ class _HomePageState extends State<HomePage> {
                             final event = events[index];
 
                             // Ensure each field is converted to a string to avoid type errors
-                            String eventName = event['eventName']?.toString() ?? 'No Event Name';
-                            String description = event['description']?.toString() ?? 'No Description';
-                            String date = event['date']?.toString() ?? 'No Date';
-                            String imageUrl = event['image']?.toString() ?? ''; // Image URL or empty string
+                            String eventName = event['eventName']?.toString() ??
+                                'No Event Name';
+                            String description =
+                                event['description']?.toString() ??
+                                    'No Description';
+                            String date =
+                                event['date']?.toString() ?? 'No Date';
+                            String imageUrl = event['image']?.toString() ??
+                                ''; // Image URL or empty string
 
                             return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Space around each ListTile
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 8.0,
+                                  horizontal:
+                                      16.0), // Space around each ListTile
                               child: ListTile(
                                 leading: Image.network(
-                                  imageUrl.isNotEmpty ? imageUrl : 'https://via.placeholder.com/100', // Fallback image if no image
+                                  imageUrl.isNotEmpty
+                                      ? imageUrl
+                                      : 'https://via.placeholder.com/100', // Fallback image if no image
                                   width: 50,
                                   height: 50,
                                   fit: BoxFit.cover,
