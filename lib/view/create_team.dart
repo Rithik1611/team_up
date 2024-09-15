@@ -154,6 +154,9 @@ class _TeamInfoPageState extends State<TeamInfoPage> {
             const SizedBox(height: 16.0),
             Center(
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 49, 0, 128),
+                ),
                 onPressed: () {
                   if (teamNameController.text.isNotEmpty &&
                       teamDescriptionController.text.isNotEmpty &&
