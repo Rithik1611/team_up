@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:team_up/db/sembast_service.dart';
@@ -13,10 +14,14 @@ class _SearchPageState extends State<SearchPage> {
   String searchQuery = '';
   Timer? debounce;
 
-  final String defaultAvatarUrl = 'https://via.placeholder.com/150'; // Default image URL
+  final String defaultAvatarUrl =
+      'https://via.placeholder.com/150'; // Default image URL
 
   String? token; // Token to be retrieved from SembastService
-  final SembastService sembastService = SembastService(); // Instantiate SembastService
+  final SembastService sembastService =
+      SembastService(); // Instantiate SembastService
+
+  bool showMessage = true; // Flag to show message
 
   @override
   void initState() {
@@ -33,7 +38,7 @@ class _SearchPageState extends State<SearchPage> {
   Future<void> initializeTokenAndFetchMembers() async {
     // Retrieve the token from SembastService
     token = await sembastService.getToken();
-    
+
     if (token != null) {
       print('Token retrieved from Sembast: $token');
     } else {
@@ -47,7 +52,8 @@ class _SearchPageState extends State<SearchPage> {
 
   Future<void> fetchTeamMembers() async {
     try {
-      String mockApiUrl = 'https://kcgteamupserver-production.up.railway.app/api/user/getAllUsers';
+      String mockApiUrl =
+          'https://kcgteamupserver-production.up.railway.app/api/user/getAllUsers';
 
       Response response = await Dio().get(
         mockApiUrl,
@@ -58,7 +64,7 @@ class _SearchPageState extends State<SearchPage> {
         ),
       );
 
-  print(token);
+      print(token);
       print("Res : $response");
       List<dynamic> data = response.data;
 
@@ -70,7 +76,8 @@ class _SearchPageState extends State<SearchPage> {
           return {
             'id': item['id'],
             'name': item['name'],
-            'avatarUrl': item['avatarUrl'] ?? defaultAvatarUrl, // Use default image if avatarUrl is null
+            'avatarUrl': item['avatarUrl'] ??
+                defaultAvatarUrl, // Use default image if avatarUrl is null
             'skills': item['skills'].join(', '), // Assuming skills is a list
           };
         }).toList();
@@ -85,6 +92,8 @@ class _SearchPageState extends State<SearchPage> {
     debounce = Timer(Duration(milliseconds: 300), () {
       setState(() {
         searchQuery = value;
+        // Update showMessage flag based on searchQuery
+        showMessage = searchQuery.isEmpty && teamMembers.isEmpty;
       });
     });
   }
@@ -112,7 +121,7 @@ class _SearchPageState extends State<SearchPage> {
             child: TextField(
               onChanged: onSearchChanged,
               decoration: InputDecoration(
-                hintText: 'Search for team members by skill or name',
+                hintText: 'Search Students',
                 prefixIcon: Icon(Icons.search),
                 suffixIcon: searchQuery.isNotEmpty
                     ? IconButton(
@@ -120,6 +129,7 @@ class _SearchPageState extends State<SearchPage> {
                         onPressed: () {
                           setState(() {
                             searchQuery = '';
+                            showMessage = teamMembers.isEmpty;
                           });
                         },
                       )
@@ -130,7 +140,16 @@ class _SearchPageState extends State<SearchPage> {
               ),
             ),
           ),
-          if (searchQuery.isNotEmpty)
+          if (showMessage)
+            Expanded(
+              child: Center(
+                child: Text(
+                  'Search Students based \n on Name and Skills',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+            )
+          else if (searchQuery.isNotEmpty)
             Expanded(
               child: ListView.builder(
                 itemCount: filteredMembers.length,
@@ -141,14 +160,15 @@ class _SearchPageState extends State<SearchPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => MemberDetailsPage(member: member),
+                          builder: (context) =>
+                              MemberDetailsPage(member: member),
                         ),
                       );
                     },
                     child: ListTile(
                       leading: CircleAvatar(
-                        backgroundImage:
-                            NetworkImage(member['avatarUrl'] ?? defaultAvatarUrl),
+                        backgroundImage: NetworkImage(
+                            member['avatarUrl'] ?? defaultAvatarUrl),
                       ),
                       title: Text(member['name']!),
                       subtitle: Text('${member['skills']}'),
@@ -163,10 +183,9 @@ class _SearchPageState extends State<SearchPage> {
   }
 }
 
-
-
 class MemberDetailsPage extends StatefulWidget {
-  final Map<String, dynamic> member; // Member details passed from the SearchPage
+  final Map<String, dynamic>
+      member; // Member details passed from the SearchPage
 
   const MemberDetailsPage({Key? key, required this.member}) : super(key: key);
 
@@ -180,7 +199,7 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
   @override
   void initState() {
     super.initState();
-    _member = widget.member;  // Initialize member details
+    _member = widget.member; // Initialize member details
   }
 
   @override
@@ -238,7 +257,8 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
                 children: (_member['skills'] as String)
                     .split(', ') // Convert comma-separated string into a list
                     .map((skill) => Chip(
-                        label: Text(skill, style: const TextStyle(color: Colors.white)),
+                        label: Text(skill,
+                            style: const TextStyle(color: Colors.white)),
                         backgroundColor: const Color.fromARGB(255, 49, 0, 128)))
                     .toList(),
               ),
@@ -249,4 +269,3 @@ class _MemberDetailsPageState extends State<MemberDetailsPage> {
     );
   }
 }
-
