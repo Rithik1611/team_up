@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:team_up/api/dio_service.dart';
 import 'package:team_up/models/student.dart';
-import 'package:team_up/view/next_page.dart';
+import 'package:team_up/view/main_screen.dart';
 
 class FormPage extends StatefulWidget {
   const FormPage({super.key});
@@ -20,15 +20,63 @@ class _FormPageState extends State<FormPage> {
   final _formKey = GlobalKey<FormState>();
 
   final List<String> _predefinedSkills = [
-    'Flutter', 'Dart', 'JavaScript', 'Python', 'Java', 'C++', 'C#', 'HTML',
-    'CSS', 'Kotlin', 'Swift', 'Ruby', 'PHP', 'SQL', 'R', 'Go', 'Rust',
-    'Scala', 'TypeScript', 'Objective-C', 'MATLAB', 'Perl', 'VBA', 'Shell Scripting',
-    'Node.js', 'React', 'Angular', 'Vue.js', 'Spring Boot', 'Django', 'Flask',
-    'Express.js', 'ASP.NET', 'Laravel', 'TensorFlow', 'PyTorch', 'Keras',
-    'OpenCV', 'Hadoop', 'Spark', 'Unity', 'Unreal Engine', 'Blender', 'AutoCAD',
-    'Machine Learning', 'Data Science', 'Cloud Computing', 'AWS', 'Azure',
-    'Google Cloud', 'Docker', 'Kubernetes', 'DevOps', 'CI/CD', 'Blockchain',
-    'Cybersecurity', 'Agile Methodologies',
+    'Flutter',
+    'Dart',
+    'JavaScript',
+    'Python',
+    'Java',
+    'C++',
+    'C#',
+    'HTML',
+    'CSS',
+    'Kotlin',
+    'Swift',
+    'Ruby',
+    'PHP',
+    'SQL',
+    'R',
+    'Go',
+    'Rust',
+    'Scala',
+    'TypeScript',
+    'Objective-C',
+    'MATLAB',
+    'Perl',
+    'VBA',
+    'Shell Scripting',
+    'Node.js',
+    'React',
+    'Angular',
+    'Vue.js',
+    'Spring Boot',
+    'Django',
+    'Flask',
+    'Express.js',
+    'ASP.NET',
+    'Laravel',
+    'TensorFlow',
+    'PyTorch',
+    'Keras',
+    'OpenCV',
+    'Hadoop',
+    'Spark',
+    'Unity',
+    'Unreal Engine',
+    'Blender',
+    'AutoCAD',
+    'Machine Learning',
+    'Data Science',
+    'Cloud Computing',
+    'AWS',
+    'Azure',
+    'Google Cloud',
+    'Docker',
+    'Kubernetes',
+    'DevOps',
+    'CI/CD',
+    'Blockchain',
+    'Cybersecurity',
+    'Agile Methodologies',
   ];
 
   String _name = '';
@@ -101,7 +149,7 @@ class _FormPageState extends State<FormPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => NextPage(student: student),
+            builder: (context) => MainScreen(student: student),
           ),
         );
       }
@@ -118,7 +166,8 @@ class _FormPageState extends State<FormPage> {
         // Check if there are at least 2 skills and 2 interests
         if (_skills.length < 2 || _interests.length < 2) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Please add at least 2 skills and 2 interests.')),
+            const SnackBar(
+                content: Text('Please add at least 2 skills and 2 interests.')),
           );
           return;
         }
@@ -173,7 +222,8 @@ class _FormPageState extends State<FormPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: stepColor, // Button color
                   ),
-                  child: const Text('Continue', style: TextStyle(color: Colors.white)),
+                  child: const Text('Continue',
+                      style: TextStyle(color: Colors.white)),
                 ),
                 if (currentStep > 0)
                   TextButton(
@@ -181,7 +231,8 @@ class _FormPageState extends State<FormPage> {
                     style: TextButton.styleFrom(
                       foregroundColor: stepColor, // Cancel button color
                     ),
-                    child: const Text('Cancel', style: TextStyle(color: Colors.black)),
+                    child: const Text('Cancel',
+                        style: TextStyle(color: Colors.black)),
                   ),
               ],
             );
@@ -206,7 +257,8 @@ class _FormPageState extends State<FormPage> {
                     ),
                     TextFormField(
                       onChanged: (value) => _department = value,
-                      decoration: const InputDecoration(labelText: 'Department'),
+                      decoration:
+                          const InputDecoration(labelText: 'Department'),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your department';
@@ -254,7 +306,8 @@ class _FormPageState extends State<FormPage> {
             ),
             Step(
               isActive: currentStep >= 1,
-              title: Text("Skills & Interests", style: TextStyle(color: stepColor)),
+              title: Text("Skills & Interests",
+                  style: TextStyle(color: stepColor)),
               content: Column(
                 children: [
                   // Skills Section
@@ -296,7 +349,8 @@ class _FormPageState extends State<FormPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: stepColor, // Button color
                     ),
-                    child: const Text('Add Skill',style: TextStyle(color: Colors.white)),
+                    child: const Text('Add Skill',
+                        style: TextStyle(color: Colors.white)),
                   ),
 
                   const SizedBox(height: 20), // Add some spacing
@@ -336,19 +390,22 @@ class _FormPageState extends State<FormPage> {
                   }),
                   ElevatedButton(
                     onPressed: () => setState(() {
-                      _interests.add(''); // Add an empty entry for a new interest
+                      _interests
+                          .add(''); // Add an empty entry for a new interest
                     }),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: stepColor, // Button color
                     ),
-                    child: const Text('Add Interest',style: TextStyle(color: Colors.white)),
+                    child: const Text('Add Interest',
+                        style: TextStyle(color: Colors.white)),
                   ),
                 ],
               ),
             ),
             Step(
               isActive: currentStep >= 2,
-              title: Text("Upload Profile Picture", style: TextStyle(color: stepColor)),
+              title: Text("Upload Profile Picture",
+                  style: TextStyle(color: stepColor)),
               content: Column(
                 children: [
                   if (_profilePic != null)
@@ -362,7 +419,8 @@ class _FormPageState extends State<FormPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: stepColor, // Button color
                     ),
-                    child: const Text('Pick Profile Picture',style: TextStyle(color: Colors.white)),
+                    child: const Text('Pick Profile Picture',
+                        style: TextStyle(color: Colors.white)),
                   ),
                 ],
               ),

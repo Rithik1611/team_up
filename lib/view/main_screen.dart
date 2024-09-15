@@ -1,21 +1,21 @@
-import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:flutter/material.dart';
 import 'package:team_up/models/student.dart';
-import 'package:team_up/view/home_page.dart';  // Import your HomePage, AddPage, and SearchPage
 import 'package:team_up/view/add_page.dart';
+import 'package:team_up/view/home_page.dart'; // Import your HomePage, AddPage, and SearchPage
 import 'package:team_up/view/profile_page.dart';
 import 'package:team_up/view/search_page.dart';
 
-class NextPage extends StatefulWidget {
+class MainScreen extends StatefulWidget {
   final Student student;
 
-  const NextPage({super.key, required this.student});
+  const MainScreen({super.key, required this.student});
 
   @override
-  _NextPageState createState() => _NextPageState();
+  _MainScreenState createState() => _MainScreenState();
 }
 
-class _NextPageState extends State<NextPage> {
+class _MainScreenState extends State<MainScreen> {
   late Student _student;
   int _pageIndex = 3; // Start with Profile page as selected
 
@@ -28,8 +28,8 @@ class _NextPageState extends State<NextPage> {
 
     // Initialize the pages
     _pages.addAll([
-      HomePage(),  // Replace with your actual HomePage
-      AddPage(),   // Replace with your actual AddPage
+      HomePage(), // Replace with your actual HomePage
+      AddPage(student: _student), // Replace with your actual AddPage
       SearchPage(), // Replace with your actual SearchPage
       ProfilePage(student: _student), // Profile page
     ]);
@@ -64,13 +64,17 @@ class _NextPageState extends State<NextPage> {
     return Container(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: _pageIndex == index ? const Color.fromARGB(255, 255, 255, 255) : Colors.transparent,
+        color: _pageIndex == index
+            ? const Color.fromARGB(255, 255, 255, 255)
+            : Colors.transparent,
       ),
       padding: const EdgeInsets.all(10.0),
       child: Icon(
         icon,
         size: 24,
-        color: _pageIndex == index ? const Color.fromARGB(255, 0, 0, 0) : const Color.fromARGB(255, 0, 0, 0),
+        color: _pageIndex == index
+            ? const Color.fromARGB(255, 0, 0, 0)
+            : const Color.fromARGB(255, 0, 0, 0),
       ),
     );
   }

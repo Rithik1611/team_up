@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:team_up/api/dio_service.dart';
 import 'package:team_up/models/student.dart';
-import 'package:team_up/view/next_page.dart'; // Adjust the import as necessary
+import 'package:team_up/view/main_screen.dart'; // Adjust the import as necessary
 
 class EditPage extends StatefulWidget {
   final Student student;
@@ -153,7 +153,7 @@ class _EditPageState extends State<EditPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => NextPage(student: student),
+            builder: (context) => MainScreen(student: student),
           ),
         );
       }
@@ -169,7 +169,7 @@ class _EditPageState extends State<EditPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Edit Details"),
-        backgroundColor:  const Color.fromARGB(255, 49, 0, 128),
+        backgroundColor: const Color.fromARGB(255, 49, 0, 128),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -293,7 +293,9 @@ class _EditPageState extends State<EditPage> {
                 ),
               ),
               onPressed: _sendData,
-              child: const Text('Save Changes',),
+              child: const Text(
+                'Save Changes',
+              ),
             ),
           ],
         ),
