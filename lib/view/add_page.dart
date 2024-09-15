@@ -80,7 +80,7 @@ class _AddPageState extends State<AddPage> {
             },
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.deepPurple,
+                color: const Color.fromARGB(255, 49, 0, 128),
                 borderRadius: BorderRadius.circular(20.0),
               ),
               child: Center(
