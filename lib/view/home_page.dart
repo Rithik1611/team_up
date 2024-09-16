@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:team_up/app/app_pallete.dart';
 import 'package:team_up/view/calendar_page.dart';
-import 'event_detail_page.dart'; // Import the new EventDetailPage
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:team_up/view/event_detail_page.dart';
+import 'package:team_up/view/teamdetails.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -81,29 +83,44 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                 ),
-                // Team Cards Section
+                // Carousel Slider for Team Cards
                 SizedBox(
-                  height: 150,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
+                  height: 200, // Adjust height if needed
+                  child: CarouselSlider.builder(
                     itemCount: teams.length,
-                    itemBuilder: (context, index) {
+                    itemBuilder: (context, index, realIndex) {
                       final team = teams[index];
                       String teamName =
                           team['name']?.toString() ?? 'No Team Name';
-                      String teamImage = team['image']?.toString() ?? '';
 
                       return TeamCard(
                         teamName: teamName,
-                        teamImage: teamImage,
+                        onTap: () {
+                          // Navigate to the TeamDetailPage with team data
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  TeamDetailPage(team: team), // Pass the team data
+                            ),
+                          );
+                        },
                       );
                     },
+                    options: CarouselOptions(
+                      height: 200,
+                      enlargeCenterPage: true,
+                      autoPlay: true,
+                      autoPlayInterval: Duration(seconds: 3),
+                      enableInfiniteScroll: true,
+                      viewportFraction: 0.8,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
                 // Calendar Button
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
                   child: GestureDetector(
                     onTap: () {
                       // Navigate to the Calendar Page
@@ -309,53 +326,50 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-// Team Card Widget
+// Team Card Widget with onTap functionality
 class TeamCard extends StatelessWidget {
   final String teamName;
-  final String teamImage;
+  final VoidCallback onTap; // Callback for onTap functionality
 
   const TeamCard({
     Key? key,
     required this.teamName,
-    required this.teamImage,
+    required this.onTap,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        alignment: Alignment.center,
-        child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Display the team image
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: teamImage.isNotEmpty
-                    ? Image.network(
-                        teamImage,
-                        height: 80,
-                        width: 80,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const SizedBox.shrink();
-                        },
-                      )
-                    : const SizedBox.shrink(),
-              ),
-              const SizedBox(height: 8),
-              // Display the team name
-              Text(
-                teamName,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+      padding: const EdgeInsets.all(0.9),
+      child: InkWell(
+        onTap: onTap, // InkWell with onTap
+        child: Container(
+          alignment: Alignment.center,
+          child: SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 8),
+                // Display the team name
+                Text(
+                  teamName,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(190, 49, 0, 128),
+            borderRadius: const BorderRadius.all(
+              Radius.circular(29),
+            ),
+          ),
+          height: 200, // Adjust height if needed
+          width: MediaQuery.of(context).size.width * 0.9, // Adjust width if needed
         ),
       ),
     );
