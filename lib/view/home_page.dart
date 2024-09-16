@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:team_up/app/app_pallete.dart';
 import 'package:team_up/view/calendar_page.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:team_up/view/teamdetails.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -93,6 +94,16 @@ class _HomePageState extends State<HomePage> {
 
                       return TeamCard(
                         teamName: teamName,
+                        onTap: () {
+                          // Navigate to the TeamDetailPage with team data
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  TeamDetailPage(team: team), // Pass the team data
+                            ),
+                          );
+                        },
                       );
                     },
                     options: CarouselOptions(
@@ -255,47 +266,51 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-// Team Card Widget
+// Team Card Widget with onTap functionality
 class TeamCard extends StatelessWidget {
   final String teamName;
+  final VoidCallback onTap; // Callback for onTap functionality
 
   const TeamCard({
     Key? key,
     required this.teamName,
+    required this.onTap,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(0.9),
-      child: Container(
-        alignment: Alignment.center,
-        child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(height: 8),
-              // Display the team name
-              Text(
-                teamName,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+      child: InkWell(
+        onTap: onTap, // InkWell with onTap
+        child: Container(
+          alignment: Alignment.center,
+          child: SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 8),
+                // Display the team name
+                Text(
+                  teamName,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-        decoration: BoxDecoration(
-          color: Color.fromARGB(190, 49, 0, 128),
-          borderRadius: BorderRadius.all(
-            Radius.circular(29),
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(190, 49, 0, 128),
+            borderRadius: const BorderRadius.all(
+              Radius.circular(29),
+            ),
           ),
+          height: 200, // Adjust height if needed
+          width: MediaQuery.of(context).size.width * 0.9, // Adjust width if needed
         ),
-        height: 200, // Adjust height if needed
-        width:
-            MediaQuery.of(context).size.width * 0.9, // Adjust width if needed
       ),
     );
   }
