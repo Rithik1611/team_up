@@ -2,10 +2,12 @@ import 'dart:io';
 
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart'; 
 import 'package:image_picker/image_picker.dart';
 
 class GetVerifiedPage extends StatefulWidget {
+  const GetVerifiedPage({super.key});
+
   @override
   _GetVerifiedPageState createState() => _GetVerifiedPageState();
 }
@@ -15,6 +17,8 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
   final _titleController = TextEditingController();
   final _dateController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _teamNameController = TextEditingController(); // New controller for team name
+  final _usernameController = TextEditingController(); // New controller for username
   DateTime? _selectedDate;
 
   Future<void> _pickImage() async {
@@ -48,7 +52,9 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
     if (_imageFile == null ||
         _titleController.text.isEmpty ||
         _dateController.text.isEmpty ||
-        _descriptionController.text.isEmpty) {
+        _descriptionController.text.isEmpty ||
+        _teamNameController.text.isEmpty || // Check if team name is empty
+        _usernameController.text.isEmpty) { // Check if username is empty
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           elevation: 0,
@@ -64,23 +70,21 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
     }
 
     try {
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse(
-            'https://your-backend-api.com/upload'), // Replace with your actual backend API endpoint
+      Dio dio = Dio();
+
+      FormData formData = FormData.fromMap({
+        'title': _titleController.text,
+        'date': _dateController.text,
+        'description': _descriptionController.text,
+        'team_name': _teamNameController.text, // Add team name
+        'username': _usernameController.text, // Add username
+        'image': await MultipartFile.fromFile(_imageFile!.path, filename: 'image.jpg'),
+      });
+
+      var response = await dio.post(
+        'https://your-backend-api.com/upload', // Replace with your actual backend API endpoint
+        data: formData,
       );
-
-      // Add fields to the request
-      request.fields['title'] = _titleController.text;
-      request.fields['date'] = _dateController.text;
-      request.fields['description'] = _descriptionController.text;
-
-      // Add image file to the request
-      request.files
-          .add(await http.MultipartFile.fromPath('image', _imageFile!.path));
-
-      // Send the request
-      var response = await request.send();
 
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -104,6 +108,8 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
           _titleController.clear();
           _dateController.clear();
           _descriptionController.clear();
+          _teamNameController.clear(); // Clear team name field
+          _usernameController.clear(); // Clear username field
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -200,6 +206,22 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
                 decoration: InputDecoration(
                   hintText: 'Enter Description',
                   border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 10),
+              Text('Team Name:'), // New label for team name
+              TextField(
+                controller: _teamNameController,
+                decoration: InputDecoration(
+                  hintText: 'Enter Team Name',
+                ),
+              ),
+              SizedBox(height: 10),
+              Text('Username:'), // New label for username
+              TextField(
+                controller: _usernameController,
+                decoration: InputDecoration(
+                  hintText: 'Enter Username',
                 ),
               ),
               SizedBox(height: 20),
