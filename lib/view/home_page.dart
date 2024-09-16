@@ -167,7 +167,7 @@ class _HomePageState extends State<HomePage> {
                             String eventName =
                                 event['eventName']?.toString() ?? 'No Event Name';
                             String date =
-                                event['date']?.toString() ?? 'No Date';
+                                event['eventDate']?.toString() ?? 'No Date';
                             String imageUrl =
                                 event['image']?.toString() ?? '';
 
