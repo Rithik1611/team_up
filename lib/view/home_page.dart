@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:team_up/app/app_pallete.dart';
 import 'package:team_up/view/calendar_page.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:team_up/view/event_detail_page.dart';
+import 'package:team_up/view/teamdetails.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -76,33 +79,48 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 10), // Adjust spacing here
+                      SizedBox(height: 10),
                     ],
                   ),
                 ),
-                // Team Cards Section
+                // Carousel Slider for Team Cards
                 SizedBox(
-                  height: 150, // Adjust height if needed
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
+                  height: 200, // Adjust height if needed
+                  child: CarouselSlider.builder(
                     itemCount: teams.length,
-                    itemBuilder: (context, index) {
+                    itemBuilder: (context, index, realIndex) {
                       final team = teams[index];
                       String teamName =
                           team['name']?.toString() ?? 'No Team Name';
-                      String teamImage = team['image']?.toString() ?? '';
 
                       return TeamCard(
                         teamName: teamName,
-                        teamImage: teamImage,
+                        onTap: () {
+                          // Navigate to the TeamDetailPage with team data
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  TeamDetailPage(team: team), // Pass the team data
+                            ),
+                          );
+                        },
                       );
                     },
+                    options: CarouselOptions(
+                      height: 200,
+                      enlargeCenterPage: true,
+                      autoPlay: true,
+                      autoPlayInterval: Duration(seconds: 3),
+                      enableInfiniteScroll: true,
+                      viewportFraction: 0.8,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
                 // Calendar Button
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
                   child: GestureDetector(
                     onTap: () {
                       // Navigate to the Calendar Page
@@ -120,7 +138,7 @@ class _HomePageState extends State<HomePage> {
                         border: Border.all(color: Colors.grey),
                         boxShadow: const [
                           BoxShadow(
-                            color: Color.fromARGB(91, 0, 0, 0) ,
+                            color: Color.fromARGB(91, 0, 0, 0),
                             spreadRadius: 2,
                             blurRadius: 5,
                             offset: Offset(0, 3),
@@ -179,6 +197,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ],
                 ),
+                // Updated Upcoming Events Section with Padding, Grey Hue, and Shadow
                 Expanded(
                   child: events.isEmpty
                       ? const Center(
@@ -191,53 +210,111 @@ class _HomePageState extends State<HomePage> {
                           ),
                         )
                       : ListView.builder(
+                          itemExtent: 95,
                           itemCount: events.length,
                           itemBuilder: (context, index) {
                             final event = events[index];
-                            String eventName = event['eventName']?.toString() ??
-                                'No Event Name';
+                            String eventName =
+                                event['eventName']?.toString() ?? 'No Event Name';
                             String date =
                                 event['eventDate']?.toString() ?? 'No Date';
-                            String imageUrl = event['image']?.toString() ?? '';
+                            String imageUrl =
+                                event['image']?.toString() ?? '';
 
                             return Padding(
                               padding: const EdgeInsets.symmetric(
-                                vertical: 8.0,
-                                horizontal: 16.0,
+                                horizontal: 14.0,
+                                vertical: 8,
                               ),
-                              child: ListTile(
-                                leading: Image.network(
-                                  imageUrl.isNotEmpty
-                                      ? imageUrl
-                                      : 'https://via.placeholder.com/100',
-                                  width: 50,
-                                  height: 50,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Image.network(
-                                      'https://via.placeholder.com/100',
-                                      width: 50,
-                                      height: 50,
-                                      fit: BoxFit.cover,
-                                    );
-                                  },
-                                ),
-                                title: Text(eventName),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(
-                                      Icons.calendar_today,
-                                      size: 16,
-                                      color: Colors.grey,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(date),
-                                  ],
-                                ),
+                              child: GestureDetector(
                                 onTap: () {
-                                  // Handle tile tap, if needed
+                                  // Navigate to EventDetailPage when clicked
+                                  String eventId =
+                                      event['id']?.toString() ?? '';
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          EventDetailPage(eventId: eventId),
+                                    ),
+                                  );
                                 },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Color.fromARGB(10, 0, 0, 0),
+                                        spreadRadius: 2,
+                                        blurRadius: 5,
+                                        offset: Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Image.network(
+                                          imageUrl.isNotEmpty
+                                              ? imageUrl
+                                              : 'https://via.placeholder.com/100',
+                                          width: 50,
+                                          height: 50,
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            return Image.network(
+                                              'https://via.placeholder.com/100',
+                                              width: 50,
+                                              height: 50,
+                                              fit: BoxFit.cover,
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              eventName,
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Row(
+                                              children: [
+                                                const Icon(
+                                                  Icons.calendar_today,
+                                                  size: 16,
+                                                  color: Colors.grey,
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Text(date),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const Icon(
+                                        Icons.arrow_forward_ios,
+                                        color: Colors.grey,
+                                      ),
+                                      SizedBox(width: 10),
+                                    ],
+                                  ),
+                                ),
                               ),
                             );
                           },
@@ -249,66 +326,51 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-// Team Card Widget
+// Team Card Widget with onTap functionality
 class TeamCard extends StatelessWidget {
   final String teamName;
-  final String teamImage;
+  final VoidCallback onTap; // Callback for onTap functionality
 
   const TeamCard({
     Key? key,
     required this.teamName,
-    required this.teamImage,
+    required this.onTap,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        alignment: Alignment.center,
-        child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Display the team image
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: teamImage.isNotEmpty
-                    ? Image.network(
-                        teamImage,
-                        height: 80,
-                        width: 80,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const SizedBox
-                              .shrink(); // No placeholder image
-                        },
-                      )
-                    : const SizedBox
-                        .shrink(), // No placeholder when no image URL
-              ),
-              const SizedBox(height: 8),
-              // Display the team name
-              Text(
-                teamName,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+      padding: const EdgeInsets.all(0.9),
+      child: InkWell(
+        onTap: onTap, // InkWell with onTap
+        child: Container(
+          alignment: Alignment.center,
+          child: SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 8),
+                // Display the team name
+                Text(
+                  teamName,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-        decoration: BoxDecoration(
-          color: Color.fromARGB(190, 49, 0, 128),
-          borderRadius: BorderRadius.all(
-            Radius.circular(12),
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(190, 49, 0, 128),
+            borderRadius: const BorderRadius.all(
+              Radius.circular(29),
+            ),
           ),
+          height: 200, // Adjust height if needed
+          width: MediaQuery.of(context).size.width * 0.9, // Adjust width if needed
         ),
-        height: 130, // Adjust height if needed
-        width:
-            MediaQuery.of(context).size.width * 0.4, // Adjust width if needed
       ),
     );
   }
