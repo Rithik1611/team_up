@@ -102,8 +102,8 @@ class _HomePageState extends State<HomePage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  TeamDetailPage(team: team), // Pass the team data
+                              builder: (context) => TeamDetailPage(
+                                  team: team), // Pass the team data
                             ),
                           );
                         },
@@ -222,12 +222,11 @@ class _HomePageState extends State<HomePage> {
                           itemCount: events.length,
                           itemBuilder: (context, index) {
                             final event = events[index];
-                            String eventName =
-                                event['eventName']?.toString() ?? 'No Event Name';
+                            String eventName = event['eventName']?.toString() ??
+                                'No Event Name';
                             String date =
                                 event['eventDate']?.toString() ?? 'No Date';
-                            String imageUrl =
-                                event['image']?.toString() ?? '';
+                            String imageUrl = event['image']?.toString() ?? '';
 
                             return Padding(
                               padding: const EdgeInsets.symmetric(
@@ -385,7 +384,8 @@ class TeamCard extends StatelessWidget {
             ),
           ),
           height: 200, // Adjust height if needed
-          width: MediaQuery.of(context).size.width * 0.9, // Adjust width if needed
+          width:
+              MediaQuery.of(context).size.width * 0.9, // Adjust width if needed
         ),
       ),
     );
