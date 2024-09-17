@@ -20,6 +20,14 @@ class _SignupPageState extends State<SignupPage> {
   final AuthViewModel _authViewModel = AuthViewModel();
 
   Future<void> _signup() async {
+    // Email validation for domain restriction
+    if (!_email.endsWith('@kcgcollege.com')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please use your college email')),
+      );
+      return;
+    }
+
     bool isSuccess = await _authViewModel.signup(
       name: _name.trim(),
       email: _email.trim(),
@@ -33,7 +41,7 @@ class _SignupPageState extends State<SignupPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Signup successful')),
       );
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => const FormPage(),
