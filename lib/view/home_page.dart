@@ -1,6 +1,7 @@
+
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:team_up/app/app_pallete.dart';
+
 import 'package:team_up/view/calendar_page.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:team_up/view/event_detail_page.dart';
@@ -79,7 +80,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 10),
+                      
                     ],
                   ),
                 ),
@@ -87,6 +88,7 @@ class _HomePageState extends State<HomePage> {
                 SizedBox(
                   height: 200, // Adjust height if needed
                   child: CarouselSlider.builder(
+                    
                     itemCount: teams.length,
                     itemBuilder: (context, index, realIndex) {
                       final team = teams[index];
@@ -133,7 +135,7 @@ class _HomePageState extends State<HomePage> {
                     child: Container(
                       padding: const EdgeInsets.all(16.0),
                       decoration: BoxDecoration(
-                        color: AppPallete.primary,
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(color: Colors.grey),
                         boxShadow: const [
@@ -150,7 +152,7 @@ class _HomePageState extends State<HomePage> {
                           Icon(
                             Icons.calendar_month_rounded,
                             size: 40,
-                            color: Color.fromARGB(255, 255, 255, 255),
+                            color: Color.fromARGB(255, 0, 0, 0),
                           ),
                           SizedBox(width: 20),
                           Column(
@@ -161,14 +163,14 @@ class _HomePageState extends State<HomePage> {
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
-                                  color: Color.fromARGB(255, 255, 255, 255),
+                                  color: Colors.black,
                                 ),
                               ),
                               Text(
                                 'Plan Your Events!',
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Color.fromARGB(255, 255, 255, 255),
+                                  color: Colors.black,
                                 ),
                               ),
                             ],
@@ -176,7 +178,7 @@ class _HomePageState extends State<HomePage> {
                           Spacer(),
                           Icon(
                             Icons.arrow_forward_ios,
-                            color: Color.fromARGB(255, 255, 255, 255),
+                            color: Color.fromARGB(255, 0, 0, 0),
                           ),
                         ],
                       ),
@@ -195,13 +197,18 @@ class _HomePageState extends State<HomePage> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    
                   ],
                 ),
+                const SizedBox(height: 10),
                 // Updated Upcoming Events Section with Padding, Grey Hue, and Shadow
                 Expanded(
+                  
                   child: events.isEmpty
                       ? const Center(
+                        
                           child: Text(
+                            
                             'No upcoming events',
                             style: TextStyle(
                               fontSize: 18,
@@ -209,6 +216,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                         )
+                        
                       : ListView.builder(
                           itemExtent: 95,
                           itemCount: events.length,
@@ -311,7 +319,7 @@ class _HomePageState extends State<HomePage> {
                                         Icons.arrow_forward_ios,
                                         color: Colors.grey,
                                       ),
-                                      SizedBox(width: 10),
+                                      const SizedBox(width: 10),
                                     ],
                                   ),
                                 ),
@@ -329,7 +337,7 @@ class _HomePageState extends State<HomePage> {
 // Team Card Widget with onTap functionality
 class TeamCard extends StatelessWidget {
   final String teamName;
-  final VoidCallback onTap; // Callback for onTap functionality
+  final VoidCallback onTap;
 
   const TeamCard({
     Key? key,
@@ -339,6 +347,10 @@ class TeamCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // List of two colors
+    
+
+   
     return Padding(
       padding: const EdgeInsets.all(0.9),
       child: InkWell(
@@ -363,7 +375,11 @@ class TeamCard extends StatelessWidget {
             ),
           ),
           decoration: BoxDecoration(
-            color: const Color.fromARGB(190, 49, 0, 128),
+            gradient:  LinearGradient(
+              colors: [const Color.fromARGB(255, 49, 0, 128), const Color.fromARGB(255, 7, 3, 3)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ), // Use randomly selected color
             borderRadius: const BorderRadius.all(
               Radius.circular(29),
             ),
