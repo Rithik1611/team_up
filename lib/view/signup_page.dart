@@ -61,7 +61,7 @@ class _SignupPageState extends State<SignupPage> {
                 'START                                            YOUR JOURNEY.',
                 style: TextStyle(fontSize: 32, color: Colors.white),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 50),
               TextField(
                 style: const TextStyle(color: Colors.white), // Input text color to white
                 decoration: InputDecoration(

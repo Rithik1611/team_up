@@ -3,13 +3,15 @@ import 'package:animate_do/animate_do.dart';
 import 'package:team_up/view/signup_page.dart';
 
 void main() => runApp(
-      MaterialApp(
+      const MaterialApp(
         debugShowCheckedModeBanner: false,
         home: StartingPage(),
       ),
     );
 
 class StartingPage extends StatefulWidget {
+  const StartingPage({super.key});
+
   @override
   _StartingPageState createState() => _StartingPageState();
 }
@@ -21,7 +23,7 @@ class _StartingPageState extends State<StartingPage> {
         body: Container(
       width: double.infinity,
       height: double.infinity, // Ensure the image takes up full height
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         image: DecorationImage(
           image: AssetImage("assets/images/kcg.jpg"),
           fit: BoxFit.cover,
@@ -44,10 +46,10 @@ class _StartingPageState extends State<StartingPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               FadeInUp(
                 duration: Duration(milliseconds: 1000),
-                child: Text(
+                child: const Text(
                   "WELCOME TO ",
                   style: TextStyle(
                     color: Colors.white,
@@ -58,7 +60,7 @@ class _StartingPageState extends State<StartingPage> {
               ),
               FadeInUp(
                 duration: Duration(milliseconds: 1000),
-                child: Text(
+                child: const Text(
                   "TEAM UP",
                   style: TextStyle(
                     color: Colors.white,
@@ -67,17 +69,17 @@ class _StartingPageState extends State<StartingPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
-              SizedBox(height: 100),
-              Spacer(), // This will push the button to the bottom
+              const SizedBox(height: 20),
+              const SizedBox(height: 100),
+              const Spacer(), // This will push the button to the bottom
               FadeIn(
-                duration: Duration(milliseconds: 1000),
+                duration: const Duration(milliseconds: 1000),
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => SignupPage(),
+                        builder: (context) => const SignupPage(),
                       ),
                     );
                     // Add your onPressed code here!
@@ -85,13 +87,17 @@ class _StartingPageState extends State<StartingPage> {
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.black,
                     backgroundColor: Colors.white, // Text color
-                    minimumSize: Size(300, 60), // Width and height
+                    minimumSize: const Size(300, 60), // Width and height
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                       // Width and height
                     ),
                   ),
-                  child: Text('Get Started'),
+                  child: const Text('GET STARTED', style: TextStyle(
+                    color: Color.fromRGBO(0, 0, 0, 1),
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),),
                 ),
               ),
             ],
