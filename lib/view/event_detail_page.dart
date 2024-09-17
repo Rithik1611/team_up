@@ -45,16 +45,32 @@ class _EventDetailPageState extends State<EventDetailPage> {
     }
   }
 
-  String formatDate(int timestamp) {
-    var date = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
-    return DateFormat.yMMMd().format(date); // Formats the date like "Sep 16, 2024"
+  // Converts eventDate from "ddMMyyyy" format to a readable date
+  String formatDate(int eventDate) {
+    // Convert the integer date to string, then format it to dd/MM/yyyy
+    String dateStr = eventDate.toString(); // Convert to string
+    // Ensure the date is exactly 8 digits (for example: 17092024)
+    if (dateStr.length == 8) {
+      String day = dateStr.substring(0, 2);
+      String month = dateStr.substring(2, 4);
+      String year = dateStr.substring(4, 8);
+      // Combine the parts into a proper date string (yyyy-MM-dd)
+      String formattedStr = "$year-$month-$day";
+      DateTime parsedDate = DateTime.parse(formattedStr); // Parse the string to DateTime
+      return DateFormat.yMMMd().format(parsedDate); // Format to readable format, e.g., Sep 17, 2024
+    } else {
+      return "Invalid Date"; // Return error text if format is wrong
+    }
   }
 
+  // Opens URL in the browser
   Future<void> _launchURL(String url) async {
     if (await canLaunch(url)) {
       await launch(url);
     } else {
-      throw 'Could not launch $url';
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not launch the URL')),
+      );
     }
   }
 
@@ -115,19 +131,21 @@ class _EventDetailPageState extends State<EventDetailPage> {
                         ),
                         const SizedBox(height: 20),
 
-                         Row(
-                          children: [
-                            const Icon(Icons.calendar_today, color: Colors.grey, size: 18),
-                            const SizedBox(width: 5),
-                            Text(
-                              'Date: ${formatDate(eventData!['eventDate'])}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
+                        // Display Event Date
+                        if (eventData!['eventDate'] != null)
+                          Row(
+                            children: [
+                              const Icon(Icons.calendar_today, color: Colors.grey, size: 18),
+                              const SizedBox(width: 5),
+                              Text(
+                                'Date: ${formatDate(eventData!['eventDate'])}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
                         const SizedBox(height: 20),
 
                         // Display Event Description
@@ -136,10 +154,6 @@ class _EventDetailPageState extends State<EventDetailPage> {
                           style: const TextStyle(fontSize: 16),
                         ),
                         const SizedBox(height: 20),
-
-                        // Display Event Date
-                        
-                        
 
                         // Display Event Link using url_launcher
                         GestureDetector(

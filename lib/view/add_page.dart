@@ -13,7 +13,7 @@ class AddPage extends StatefulWidget {
   State<AddPage> createState() => _AddPageState();
 }
 
-class _AddPageState extends State<AddPage> {
+class _AddPageState extends State<AddPage> with TickerProviderStateMixin {
   late Student _student;
 
   @override
@@ -31,71 +31,99 @@ class _AddPageState extends State<AddPage> {
       'Admin Control'
     ];
 
+    final List<IconData> buttonIcons = [
+      Icons.group_add,
+      Icons.group,
+      Icons.upload_file,
+      Icons.admin_panel_settings,
+    ];
+
+    final List<Widget> buttonPages = [
+      CreateTeam(student: _student),
+      const JoinTeam(),
+      const Upload(),
+      const AdminControl(),
+    ];
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: const Color.fromARGB(255, 49, 0, 128),
         title: const Text('Add'),
       ),
-      body: GridView.builder(
+      body: Padding(
         padding: const EdgeInsets.all(16.0),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16.0,
-          mainAxisSpacing: 16.0,
+        child: GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 16.0,
+            mainAxisSpacing: 16.0,
+          ),
+          itemCount: buttonNames.length,
+          itemBuilder: (context, index) {
+            return _buildAnimatedGridButton(
+              context,
+              buttonNames[index],
+              buttonIcons[index],
+              index,
+              buttonPages[index],
+            );
+          },
         ),
-        itemCount: buttonNames.length,
-        itemBuilder: (context, index) {
-          return GestureDetector(
-            onTap: () {
-              switch (index) {
-                case 0:
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CreateTeam(student: _student),
-                    ),
-                  );
-                  break;
-                case 1:
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const JoinTeam()),
-                  );
-                  break;
-                case 2:
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Upload()),
-                  );
-                  break;
-                case 3:
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const AdminControl()),
-                  );
-                  break;
-              }
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 49, 0, 128),
-                borderRadius: BorderRadius.circular(20.0),
-              ),
-              child: Center(
-                child: Text(
-                  buttonNames[index],
+      ),
+    );
+  }
+
+  Widget _buildAnimatedGridButton(
+      BuildContext context, String title, IconData icon, int index, Widget page) {
+    // Alternate left and right based on index
+    bool isFromLeft = index % 2 == 0;
+
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: isFromLeft ? -500 : 500, end: 0),
+      duration: Duration(milliseconds: 600 + (index * 100)), // Staggered animation
+      curve: Curves.easeOut,
+      builder: (context, value, child) {
+        return Transform.translate(
+          offset: Offset(value, 0), // Horizontal offset
+          child: child,
+        );
+      },
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => page),
+          );
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [const Color.fromARGB(255, 49, 0, 128), const Color.fromARGB(255, 7, 3, 3)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            color: const Color.fromARGB(255, 0, 0, 0),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, size: 40, color: Colors.white),
+                const SizedBox(height: 10),
+                Text(
+                  title,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 18.0,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
+              ],
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }
