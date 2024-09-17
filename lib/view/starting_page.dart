@@ -76,7 +76,7 @@ class _StartingPageState extends State<StartingPage> {
                 duration: const Duration(milliseconds: 1000),
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
+                    Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                         builder: (context) => const SignupPage(),

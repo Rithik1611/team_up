@@ -146,7 +146,7 @@ class _FormPageState extends State<FormPage> {
           profilePic: _profilePic ?? File(''),
         );
 
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => MainScreen(student: student),
