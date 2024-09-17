@@ -116,8 +116,11 @@ class _SearchPageState extends State<SearchPage> {
       ),
       body: Column(
         children: <Widget>[
+          SizedBox(
+            height: 5,
+          ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(10.0),
             child: TextField(
               onChanged: onSearchChanged,
               decoration: InputDecoration(
@@ -135,7 +138,7 @@ class _SearchPageState extends State<SearchPage> {
                       )
                     : null,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20.0),
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
               ),
             ),

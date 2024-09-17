@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
@@ -80,45 +79,57 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ],
                       ),
-                      
                     ],
                   ),
                 ),
-                // Carousel Slider for Team Cards
-                SizedBox(
-                  height: 200, // Adjust height if needed
-                  child: CarouselSlider.builder(
-                    
-                    itemCount: teams.length,
-                    itemBuilder: (context, index, realIndex) {
-                      final team = teams[index];
-                      String teamName =
-                          team['name']?.toString() ?? 'No Team Name';
+                // Display message if no teams available
+                if (teams.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.all(90.0),
+                    child: Text(
+                      'No Teams Joined Yet',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  )
+                else
+                  // Carousel Slider for Team Cards
+                  SizedBox(
+                    height: 200, // Adjust height if needed
+                    child: CarouselSlider.builder(
+                      itemCount: teams.length,
+                      itemBuilder: (context, index, realIndex) {
+                        final team = teams[index];
+                        String teamName =
+                            team['name']?.toString() ?? 'No Team Name';
 
-                      return TeamCard(
-                        teamName: teamName,
-                        onTap: () {
-                          // Navigate to the TeamDetailPage with team data
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TeamDetailPage(
-                                  team: team), // Pass the team data
-                            ),
-                          );
-                        },
-                      );
-                    },
-                    options: CarouselOptions(
-                      height: 200,
-                      enlargeCenterPage: true,
-                      autoPlay: true,
-                      autoPlayInterval: Duration(seconds: 3),
-                      enableInfiniteScroll: true,
-                      viewportFraction: 0.8,
+                        return TeamCard(
+                          teamName: teamName,
+                          onTap: () {
+                            // Navigate to the TeamDetailPage with team data
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    TeamDetailPage(team: team), // Pass the team data
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      options: CarouselOptions(
+                        height: 200,
+                        enlargeCenterPage: true,
+                        autoPlay: true,
+                        autoPlayInterval: Duration(seconds: 3),
+                        enableInfiniteScroll: true,
+                        viewportFraction: 0.8,
+                      ),
                     ),
                   ),
-                ),
                 const SizedBox(height: 20),
                 // Calendar Button
                 Padding(
@@ -185,7 +196,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 30),
                 const Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -197,18 +208,14 @@ class _HomePageState extends State<HomePage> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    
                   ],
                 ),
                 const SizedBox(height: 10),
                 // Updated Upcoming Events Section with Padding, Grey Hue, and Shadow
                 Expanded(
-                  
                   child: events.isEmpty
                       ? const Center(
-                        
                           child: Text(
-                            
                             'No upcoming events',
                             style: TextStyle(
                               fontSize: 18,
@@ -216,7 +223,6 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                         )
-                        
                       : ListView.builder(
                           itemExtent: 95,
                           itemCount: events.length,
@@ -346,10 +352,6 @@ class TeamCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // List of two colors
-    
-
-   
     return Padding(
       padding: const EdgeInsets.all(0.9),
       child: InkWell(
@@ -374,18 +376,20 @@ class TeamCard extends StatelessWidget {
             ),
           ),
           decoration: BoxDecoration(
-            gradient:  LinearGradient(
-              colors: [const Color.fromARGB(255, 49, 0, 128), const Color.fromARGB(255, 7, 3, 3)],
+            gradient: LinearGradient(
+              colors: [
+                const Color.fromARGB(255, 49, 0, 128),
+                const Color.fromARGB(255, 7, 3, 3)
+              ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-            ), // Use randomly selected color
+            ),
             borderRadius: const BorderRadius.all(
               Radius.circular(29),
             ),
           ),
           height: 200, // Adjust height if needed
-          width:
-              MediaQuery.of(context).size.width * 0.9, // Adjust width if needed
+          width: MediaQuery.of(context).size.width * 0.9, // Adjust width if needed
         ),
       ),
     );
