@@ -39,6 +39,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_heatmap_calendar: ^1.0.5
+  flutter_launcher_icons: ^0.13.1
   getwidget: ^4.0.0
   google_fonts: ^6.2.1
   iconify_flutter: ^0.0.5
@@ -52,8 +53,13 @@ dependencies:
   table_calendar: ^3.1.2
   url_launcher: ^6.3.0
 
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/logo.jpg"
+
 dev_dependencies:
-  flutter_lints: ^3.0.0
+  flutter_lints: ^3.0.0 
   flutter_test:
     sdk: flutter
 
