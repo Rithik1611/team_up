@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // For date formatting
+import 'package:team_up/app/app_pallete.dart';
 import 'package:team_up/db/sembast_service.dart';
 
 class Notifications extends StatefulWidget {
@@ -95,6 +96,7 @@ class _NotificationsState extends State<Notifications> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Notifications'),
+        backgroundColor: AppPallete.primary,
       ),
       body: _messages.isEmpty
           ? Center(child: Text('No notifications found.'))
