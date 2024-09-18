@@ -5,7 +5,7 @@ import 'package:team_up/db/sembast_service.dart'; // Ensure you have the correct
 class TeamDetailPage extends StatefulWidget {
   final String teamId;
 
-  const TeamDetailPage({Key? key, required this.teamId}) : super(key: key);
+  const TeamDetailPage({Key? key, required this.teamId, required team}) : super(key: key);
 
   @override
   _TeamDetailPageState createState() => _TeamDetailPageState();
