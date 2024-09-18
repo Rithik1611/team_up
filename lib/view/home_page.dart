@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
-
-import 'package:team_up/view/calendar_page.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:team_up/db/sembast_service.dart';
+import 'package:team_up/view/calendar_page.dart';
 import 'package:team_up/view/event_detail_page.dart';
 import 'package:team_up/view/teamdetails.dart';
 
@@ -26,11 +26,28 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> fetchData() async {
     Dio dio = Dio();
+    SembastService sembastService = SembastService();
+
     try {
-      final eventsResponse = await dio
-          .get('https://66e6c57517055714e58a7cc9.mockapi.io/api/v1/events');
-      final teamsResponse =
-          await dio.get('https://66e5b9195cc7f9b6273e2c1b.mockapi.io/teamname');
+      // Retrieve token from SembastService
+      final token = await sembastService.getToken();
+
+      // Add token to headers if available
+      final options = Options(
+        headers: token != null ? {'Authorization': 'Bearer $token'} : {},
+      );
+      final teamsResponse = await dio.get(
+        'https://kcgteamupserver-production.up.railway.app/api/team/getUserTeams',
+        options: options,
+      );
+      print(teamsResponse.data);
+      // Fetch events
+      final eventsResponse = await dio.get(
+        'https://kcgteamupserver-production.up.railway.app/api/event/all',
+        options: options,
+      );
+
+      // Fetch teams
 
       if (!mounted) return;
 
@@ -98,23 +115,26 @@ class _HomePageState extends State<HomePage> {
                 else
                   // Carousel Slider for Team Cards
                   SizedBox(
-                    height: 200, // Adjust height if needed
+                    height: 200,
                     child: CarouselSlider.builder(
                       itemCount: teams.length,
                       itemBuilder: (context, index, realIndex) {
                         final team = teams[index];
                         String teamName =
-                            team['name']?.toString() ?? 'No Team Name';
+                            team['teamName']?.toString() ?? 'No Team Name';
+                        String teamId =
+                            team['teamId']?.toString() ?? ''; // Get teamId
 
                         return TeamCard(
                           teamName: teamName,
+                          teamId: teamId, // Pass teamId
                           onTap: () {
-                            // Navigate to the TeamDetailPage with team data
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    TeamDetailPage(team: team), // Pass the team data
+                                builder: (context) => TeamDetailPage(
+                                  teamId: teamId, // Pass teamId
+                                ),
                               ),
                             );
                           },
@@ -130,6 +150,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
+
                 const SizedBox(height: 20),
                 // Calendar Button
                 Padding(
@@ -339,14 +360,15 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-// Team Card Widget with onTap functionality
 class TeamCard extends StatelessWidget {
   final String teamName;
+  final String teamId; // Add this line
   final VoidCallback onTap;
 
   const TeamCard({
     Key? key,
     required this.teamName,
+    required this.teamId, // Add this line
     required this.onTap,
   }) : super(key: key);
 
@@ -355,7 +377,7 @@ class TeamCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(0.9),
       child: InkWell(
-        onTap: onTap, // InkWell with onTap
+        onTap: onTap,
         child: Container(
           alignment: Alignment.center,
           child: SafeArea(
@@ -363,7 +385,6 @@ class TeamCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 8),
-                // Display the team name
                 Text(
                   teamName,
                   style: const TextStyle(
@@ -388,8 +409,8 @@ class TeamCard extends StatelessWidget {
               Radius.circular(29),
             ),
           ),
-          height: 200, // Adjust height if needed
-          width: MediaQuery.of(context).size.width * 0.9, // Adjust width if needed
+          height: 200,
+          width: MediaQuery.of(context).size.width * 0.9,
         ),
       ),
     );
