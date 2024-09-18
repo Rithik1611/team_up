@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:team_up/db/sembast_service.dart';
+import 'package:url_launcher/url_launcher.dart'; // Import MemberDetailsPage
 
 class SearchPage extends StatefulWidget {
   @override
@@ -43,7 +44,7 @@ class _SearchPageState extends State<SearchPage> {
       print('Token retrieved from Sembast: $token');
     } else {
       print('No token found, please log in.');
-      // You can handle the case where no token is found if needed
+      // Handle the case where no token is found if needed
     }
 
     // Fetch team members after token retrieval
@@ -63,7 +64,7 @@ class _SearchPageState extends State<SearchPage> {
           },
         ),
       );
-
+      print(response);
       print(token);
       print("Res : $response");
       List<dynamic> data = response.data;
@@ -76,7 +77,7 @@ class _SearchPageState extends State<SearchPage> {
           return {
             'id': item['id'],
             'name': item['name'],
-            'avatarUrl': item['avatarUrl'] ??
+            'profilePic': item['profilePic'] ??
                 defaultAvatarUrl, // Use default image if avatarUrl is null
             'skills': item['skills'].join(', '), // Assuming skills is a list
           };
@@ -163,8 +164,9 @@ class _SearchPageState extends State<SearchPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              MemberDetailsPage(member: member),
+                          builder: (context) => MemberDetailsPage(
+                              memberId:
+                                  member['id']), // Pass id to MemberDetailsPage
                         ),
                       );
                     },
@@ -187,88 +189,230 @@ class _SearchPageState extends State<SearchPage> {
 }
 
 class MemberDetailsPage extends StatefulWidget {
-  final Map<String, dynamic>
-      member; // Member details passed from the SearchPage
+  final String memberId; // Member ID to fetch details
 
-  const MemberDetailsPage({Key? key, required this.member}) : super(key: key);
+  const MemberDetailsPage({Key? key, required this.memberId}) : super(key: key);
 
   @override
   _MemberDetailsPageState createState() => _MemberDetailsPageState();
 }
 
 class _MemberDetailsPageState extends State<MemberDetailsPage> {
-  late Map<String, dynamic> _member;
+  late Future<Map<String, dynamic>> _memberFuture;
 
   @override
   void initState() {
     super.initState();
-    _member = widget.member; // Initialize member details
+    _memberFuture = _fetchMemberDetails(widget.memberId);
+  }
+
+  Future<Map<String, dynamic>> _fetchMemberDetails(String id) async {
+    final Dio _dio = Dio();
+    final SembastService _sembastService = SembastService();
+    try {
+      final token = await _sembastService.getToken(); // Fetch the token
+      final response = await _dio.get(
+        'https://kcgteamupserver-production.up.railway.app/api/user/$id',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token', // Add token to the headers
+          },
+        ),
+      );
+      return response.data;
+    } catch (e) {
+      throw Exception('Failed to load member details: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
         backgroundColor: const Color.fromARGB(255, 49, 0, 128),
         title: const Text("Member Profile"),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 40,
-                    backgroundImage: NetworkImage(_member['avatarUrl']),
-                    backgroundColor: const Color.fromARGB(255, 137, 137, 137),
-                  ),
-                  const SizedBox(width: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _member['name'],
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: _memberFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data == null) {
+            return Center(child: Text('No data found'));
+          } else {
+            final _member = snapshot.data!;
+            return SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 40,
+                          backgroundImage: NetworkImage(_member['profilePic']),
+                          backgroundColor:
+                              const Color.fromARGB(255, 137, 137, 137),
                         ),
+                        const SizedBox(width: 16),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _member['name'],
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            Text(
+                              '${_member['year']} Year',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            Text(
+                              _member['department'],
+                              style: const TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            Text(
+                              _member['section'],
+                              style: const TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Skill set:',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
                       ),
-                      // If additional details like year/department/section exist in member, show them here
+                    ),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 8.0,
+                      children: (_member['skills'] as List<dynamic>)
+                          .map((skill) => Chip(
+                                label: Text(skill as String,
+                                    style:
+                                        const TextStyle(color: Colors.white)),
+                                backgroundColor:
+                                    const Color.fromARGB(255, 49, 0, 128),
+                              ))
+                          .toList(),
+                    ),
+                    const SizedBox(height: 20),
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Interested:',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 8.0,
+                      children: (_member['interests'] as List<dynamic>)
+                          .map((interest) => Chip(
+                                label: Text(interest as String,
+                                    style:
+                                        const TextStyle(color: Colors.white)),
+                                backgroundColor:
+                                    const Color.fromARGB(255, 49, 0, 128),
+                              ))
+                          .toList(),
+                    ),
+                    const SizedBox(height: 20),
+                    // Add links to LinkedIn, Portfolio, GitHub
+                    if (_member['linkedin'] != null) ...[
+                      _buildLinkTile(
+                        icon: Icons.link,
+                        title: 'LinkedIn',
+                        url: _member['linkedin'],
+                      ),
+                      const SizedBox(height: 10),
                     ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Skill set:',
-                  style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black),
+                    if (_member['portfolio'] != null) ...[
+                      _buildLinkTile(
+                        icon: Icons.web,
+                        title: 'Portfolio',
+                        url: _member['portfolio'],
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                    if (_member['github'] != null) ...[
+                      _buildLinkTile(
+                        icon: Icons.check,
+                        title: 'GitHub',
+                        url: _member['github'],
+                      ),
+                    ],
+                  ],
                 ),
               ),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 8.0,
-                children: (_member['skills'] as String)
-                    .split(', ') // Convert comma-separated string into a list
-                    .map((skill) => Chip(
-                        label: Text(skill,
-                            style: const TextStyle(color: Colors.white)),
-                        backgroundColor: const Color.fromARGB(255, 49, 0, 128)))
-                    .toList(),
-              ),
-            ],
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _buildLinkTile(
+      {required IconData icon, required String title, required String url}) {
+    return InkWell(
+      onTap: () => _launchURL(url),
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(12),
+        tileColor: Colors.grey[200],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        leading: Icon(icon, size: 30, color: Colors.black),
+        trailing: const Icon(Icons.arrow_forward, color: Colors.black),
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        subtitle: Text(
+          url,
+          style: const TextStyle(
+            fontSize: 14,
+            color: Colors.grey,
           ),
         ),
       ),
     );
+  }
+
+  void _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 }

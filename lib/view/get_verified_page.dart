@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart'; 
 import 'package:image_picker/image_picker.dart';
+import 'package:team_up/db/sembast_service.dart';
 
 class GetVerifiedPage extends StatefulWidget {
   const GetVerifiedPage({super.key});
@@ -17,14 +17,14 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
   final _titleController = TextEditingController();
   final _dateController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _teamNameController = TextEditingController(); // New controller for team name
-  final _usernameController = TextEditingController(); // New controller for username
+  final _teamNameController = TextEditingController();
   DateTime? _selectedDate;
+  final SembastService _sembastService =
+      SembastService(); // Initialize SembastService
 
   Future<void> _pickImage() async {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
-
     setState(() {
       if (pickedFile != null) {
         _imageFile = File(pickedFile.path);
@@ -39,7 +39,6 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
       firstDate: DateTime(1900),
       lastDate: DateTime(2100),
     );
-
     if (pickedDate != null && pickedDate != _selectedDate) {
       setState(() {
         _selectedDate = pickedDate;
@@ -53,88 +52,60 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
         _titleController.text.isEmpty ||
         _dateController.text.isEmpty ||
         _descriptionController.text.isEmpty ||
-        _teamNameController.text.isEmpty || // Check if team name is empty
-        _usernameController.text.isEmpty) { // Check if username is empty
+        _teamNameController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          content: AwesomeSnackbarContent(
-            title: 'Warning',
-            message: 'Please fill all fields',
-            contentType: ContentType.failure,
-          ),
-        ),
+        const SnackBar(content: Text('Please fill all fields')),
       );
       return;
     }
 
-    try {
-      Dio dio = Dio();
+    String? token = await _sembastService.getToken(); // Retrieve the token
 
-      FormData formData = FormData.fromMap({
-        'title': _titleController.text,
-        'date': _dateController.text,
-        'description': _descriptionController.text,
-        'team_name': _teamNameController.text, // Add team name
-        'username': _usernameController.text, // Add username
-        'image': await MultipartFile.fromFile(_imageFile!.path, filename: 'image.jpg'),
-      });
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Token not available. Please login.')),
+      );
+      return;
+    }
 
-      var response = await dio.post(
-        'https://your-backend-api.com/upload', // Replace with your actual backend API endpoint
-        data: formData,
+    Dio dio = Dio();
+
+    FormData formData = FormData.fromMap({
+      'eventName': _titleController.text,
+      'date': _dateController.text,
+      'description': _descriptionController.text,
+      'teamName': _teamNameController.text,
+      'poster':
+          await MultipartFile.fromFile(_imageFile!.path, filename: 'image.jpg'),
+    });
+
+    var response = await dio.post(
+      'https://kcgteamupserver-production.up.railway.app/api/user/achievement/create',
+      data: formData,
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $token', // Add token to request headers
+        },
+      ),
+    );
+
+    if (response.statusCode == 201) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Achievement uploaded successfully')),
       );
 
-      if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            content: AwesomeSnackbarContent(
-              title: 'Success',
-              message: 'Achievement uploaded successfully.',
-              contentType: ContentType.success,
-            ),
-          ),
-        );
+      Navigator.pop(context, DateTime.now());
 
-        // After successful upload, pass the current date back to ProfilePage
-        Navigator.pop(context, DateTime.now());
-
-        // Reset fields after successful upload
-        setState(() {
-          _imageFile = null;
-          _titleController.clear();
-          _dateController.clear();
-          _descriptionController.clear();
-          _teamNameController.clear(); // Clear team name field
-          _usernameController.clear(); // Clear username field
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            content: AwesomeSnackbarContent(
-              title: 'Upload Failed',
-              message: 'Failed to upload achievement.',
-              contentType: ContentType.failure,
-            ),
-          ),
-        );
-      }
-    } catch (e) {
+      setState(() {
+        _imageFile = null;
+        _titleController.clear();
+        _dateController.clear();
+        _descriptionController.clear();
+        _teamNameController.clear();
+      });
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          content: AwesomeSnackbarContent(
-            title: 'Error',
-            message: 'An error occurred: $e',
-            contentType: ContentType.failure,
-          ),
-        ),
+        const SnackBar(content: Text('Failed to upload achievement')),
       );
     }
   }
@@ -143,7 +114,7 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Get Verified'),
+        title: const Text('Get Verified'),
         backgroundColor: const Color.fromARGB(255, 49, 0, 128),
       ),
       body: SingleChildScrollView(
@@ -162,33 +133,22 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: _imageFile == null
-                      ? Center(
-                          child: Text(
-                            'Upload Image',
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        )
+                      ? const Center(
+                          child: Text('Upload Image',
+                              style: TextStyle(color: Colors.grey)))
                       : Image.file(_imageFile!, fit: BoxFit.cover),
                 ),
               ),
-              SizedBox(height: 20),
-              Text('Post Title:'),
+              const SizedBox(height: 20),
+              const Text('Post Title:'),
               TextField(
                 controller: _titleController,
-                decoration: InputDecoration(
-                  hintText: 'Enter Title',
-                ),
+                decoration: const InputDecoration(hintText: 'Enter Title'),
               ),
-              SizedBox(height: 10),
-              Text('Date:'),
+              const SizedBox(height: 10),
+              const Text('Date:'),
               TextFormField(
                 readOnly: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter Date of the Event';
-                  }
-                  return null;
-                },
                 decoration: InputDecoration(
                   labelText: 'Select Date',
                   suffixIcon: IconButton(
@@ -198,58 +158,35 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
                 ),
                 controller: _dateController,
               ),
-              SizedBox(height: 10),
-              Text('Description:'),
+              const SizedBox(height: 10),
+              const Text('Description:'),
               TextField(
                 controller: _descriptionController,
                 maxLines: 4,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Enter Description',
                   border: OutlineInputBorder(),
                 ),
               ),
-              SizedBox(height: 10),
-              Text('Team Name:'), // New label for team name
+              const SizedBox(height: 10),
+              const Text('Team Name:'),
               TextField(
                 controller: _teamNameController,
-                decoration: InputDecoration(
-                  hintText: 'Enter Team Name',
-                ),
+                decoration: const InputDecoration(hintText: 'Enter Team Name'),
               ),
-              SizedBox(height: 10),
-              Text('Username:'), // New label for username
-              TextField(
-                controller: _usernameController,
-                decoration: InputDecoration(
-                  hintText: 'Enter Username',
-                ),
-              ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 49, 0, 128),
                   ),
                   onPressed: _uploadAchievement,
-                  child: Text('UPLOAD'),
+                  child: const Text('UPLOAD'),
                 ),
               ),
             ],
           ),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'List'),
-          BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Add'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-          BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'),
-        ],
-        currentIndex: 2,
-        onTap: (index) {
-          // Handle navigation tap
-        },
       ),
     );
   }
