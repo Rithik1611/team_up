@@ -1,8 +1,9 @@
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart'; // Import the package
-import 'package:flutter/material.dart';
-import 'package:dio/dio.dart'; // Import Dio package
-import 'package:image_picker/image_picker.dart'; // Import ImagePicker package
 import 'dart:io'; // Import to handle file
+
+import 'package:dio/dio.dart'; // Import Dio package
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart'; // Import ImagePicker package
+import 'package:team_up/db/sembast_service.dart';
 
 class AdminControlPage extends StatefulWidget {
   const AdminControlPage({Key? key}) : super(key: key);
@@ -12,13 +13,14 @@ class AdminControlPage extends StatefulWidget {
 }
 
 class _AdminControlPageState extends State<AdminControlPage> {
-  final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _courseLinkController = TextEditingController();
   final _aboutController = TextEditingController();
   DateTime? _selectedDate;
   File? _selectedImage;
+  final SembastService _sembastService =
+      SembastService(); // Create an instance of SembastService
 
   @override
   void dispose() {
@@ -55,53 +57,60 @@ class _AdminControlPageState extends State<AdminControlPage> {
   }
 
   Future<void> _postEventToServer() async {
-    try {
-      final eventData = {
-        "title": _titleController.text,
-        "courseLink": _courseLinkController.text,
-        "date": _selectedDate?.toIso8601String(),
-        "eventType": _descriptionController.text,
-        "about": _aboutController.text,
-      };
+    final token = await _sembastService
+        .getToken(); // Retrieve the token from SembastService
 
-      FormData formData = FormData.fromMap({
-        ...eventData,
-        if (_selectedImage != null)
-          "file": await MultipartFile.fromFile(_selectedImage!.path,
-              filename: "event_poster.jpg"),
-      });
-
-      var response = await Dio().post(
-        'https://your-server-url.com/api/addEvent',
-        data: formData,
-      );
-
-      if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            elevation: 0,
-            backgroundColor: Colors.transparent,
-            content: AwesomeSnackbarContent(
-              title: 'Posted!',
-              message: 'New event has been added.',
-              contentType: ContentType.success,
-            ),
-          ),
-        );
-        Navigator.of(context).pop(true);
-      } else {
-        throw Exception('Failed to post event');
-      }
-    } catch (e) {
+    if (token == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          content: AwesomeSnackbarContent(
-            title: 'Error!',
-            message: 'Failed to post event. Please try again.',
-            contentType: ContentType.failure,
-          ),
+          content: Text('No token found. Please log in.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final eventData = {
+      "eventName": _titleController.text,
+      "eventLink": _courseLinkController.text,
+      "eventDate": _selectedDate?.toIso8601String(),
+      "eventType": _descriptionController.text,
+      "eventDes": _aboutController.text,
+    };
+
+    FormData formData = FormData.fromMap({
+      ...eventData,
+      if (_selectedImage != null)
+        "eventPoster": await MultipartFile.fromFile(
+          _selectedImage!.path,
+          filename: "event_poster.jpg",
+        ),
+    });
+
+    var response = await Dio().post(
+      'https://kcgteamupserver-production.up.railway.app/api/event/create',
+      data: formData,
+      options: Options(
+        headers: {
+          "Authorization":
+              "Bearer $token", // Pass the token in the Authorization header
+        },
+      ),
+    );
+
+    if (response.statusCode == 201) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('New event has been added successfully!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      Navigator.of(context).pop(true);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to post event. Please try again.'),
+          backgroundColor: Colors.red,
         ),
       );
     }
@@ -196,11 +205,7 @@ class _AdminControlPageState extends State<AdminControlPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 49, 0, 128),
                   ),
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      _postEventToServer();
-                    }
-                  },
+                  onPressed: _postEventToServer,
                   child: Text('POST EVENT'),
                 ),
               ),
