@@ -3,16 +3,14 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:team_up/db/sembast_service.dart'; // Import the SembastService
+import 'package:team_up/db/sembast_service.dart';
 import 'package:team_up/models/student.dart';
-import 'package:team_up/view/main_screen.dart'; // Import your MainScreen
+import 'package:team_up/view/main_screen.dart';
 import 'package:team_up/view/starting_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final SembastService sembastService = SembastService();
-
-  // Check token validity before running the app
   final bool isValid = await sembastService.isTokenValid();
 
   runApp(MyApp(isTokenValid: isValid));
@@ -29,18 +27,17 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   Dio _dio = Dio();
-  Student? _student; // Define a Student object to hold the student data
+  Student? _student;
 
   @override
   void initState() {
     super.initState();
     if (widget.isTokenValid) {
-      _fetchCurrentUser(); // Fetch user data when the app starts
+      _fetchCurrentUser();
     }
   }
 
   Future<void> _fetchCurrentUser() async {
-    // Get token from Sembast service
     final SembastService sembastService = SembastService();
     final String? token = await sembastService.getToken();
 
@@ -49,16 +46,14 @@ class _MyAppState extends State<MyApp> {
         "https://kcgteamupserver-production.up.railway.app/api/user/currentUser",
         options: Options(
           headers: {
-            'Authorization': 'Bearer $token', // Add token to the headers
+            'Authorization': 'Bearer $token',
           },
         ),
       );
 
-      // Parse the response data to extract relevant fields
       final data = response.data;
       print(data);
 
-      // Assuming profilePic is a URL or path, you can handle downloading/loading the image
       _student = Student(
         name: data['name'],
         year: data['year'],
@@ -71,9 +66,6 @@ class _MyAppState extends State<MyApp> {
       );
 
       print('Student details stored: $_student');
-
-      // After fetching the data, update the UI
-      setState(() {});
     }
   }
 
@@ -90,9 +82,8 @@ class _MyAppState extends State<MyApp> {
         useMaterial3: false,
       ),
       home: widget.isTokenValid && _student != null
-          ? MainScreen(
-              student: _student!) // Pass the student data to MainScreen
-          : StartingPage(), // If token is invalid or student is null, show the StartingPage
+          ? MainScreen(student: _student!)
+          : StartingPage(),
     );
   }
 }

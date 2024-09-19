@@ -1,4 +1,6 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:team_up/db/sembast_service.dart'; // Import your SembastService
 
 class EditSocialPage extends StatefulWidget {
   final String linkedinUrl;
@@ -19,6 +21,7 @@ class _EditPageState extends State<EditSocialPage> {
   late TextEditingController _linkedinController;
   late TextEditingController _githubController;
   late TextEditingController _portfolioController;
+  Dio _dio = Dio(); // Initialize Dio for making HTTP requests
 
   @override
   void initState() {
@@ -36,6 +39,41 @@ class _EditPageState extends State<EditSocialPage> {
     super.dispose();
   }
 
+  Future<void> _saveSocialLinks() async {
+    // Get token from SembastService
+    final SembastService sembastService = SembastService();
+    final String? token = await sembastService.getToken();
+
+    if (token != null) {
+      // Prepare the data to send
+      final Map<String, dynamic> socialLinks = {
+        'linkedin': _linkedinController.text,
+        'github': _githubController.text,
+        'portfolio': _portfolioController.text,
+      };
+
+      // Send POST request with token in the header
+      Response response = await _dio.post(
+        "https://kcgteamupserver-production.up.railway.app/api/user/updateLinks",
+        data: socialLinks,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token', // Include token in the headers
+          },
+        ),
+      );
+      print(response);
+
+      if (response.statusCode == 200) {
+        print("Social links updated successfully.");
+      } else {
+        print("Failed to update social links.");
+      }
+    } else {
+      print("No token found.");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,9 +82,9 @@ class _EditPageState extends State<EditSocialPage> {
         actions: [
           IconButton(
             icon: Icon(Icons.save),
-            onPressed: () {
-              // Save logic goes here
-              Navigator.pop(context);
+            onPressed: () async {
+              await _saveSocialLinks(); // Trigger POST request on save
+              Navigator.pop(context); // Go back after saving
             },
           ),
         ],
