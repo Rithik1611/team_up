@@ -1,6 +1,9 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:team_up/db/sembast_service.dart';
 import 'package:team_up/services/data_service.dart';
+import 'package:team_up/view/notifications.dart';
 import 'package:team_up/view/team_detail_page.dart';
 import 'package:team_up/widget/calendar_button.dart';
 import 'package:team_up/widget/events_list.dart';
@@ -26,10 +29,33 @@ class _HomePageState extends State<HomePage> {
     fetchData();
   }
 
+  final Dio dio = Dio();
+  final SembastService sembastService = SembastService();
+
   Future<void> fetchData() async {
-    try {
-      final eventsData = await dataService.fetchEvents();
-      final teamsData = await dataService.fetchTeams();
+    final token = await sembastService.getToken();
+
+    final teamsResponse = await dio.get(
+      'https://kcgteamupserver-production.up.railway.app/api/team/getUserTeams',
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      ),
+    );
+
+    final eventsResponse = await dio.get(
+      'https://kcgteamupserver-production.up.railway.app/api/event/all',
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      ),
+    );
+    print(eventsResponse);
+    if (teamsResponse.statusCode == 200 && eventsResponse.statusCode == 200) {
+      final teamsData = teamsResponse.data;
+      final eventsData = eventsResponse.data;
 
       if (!mounted) return;
 
@@ -38,9 +64,7 @@ class _HomePageState extends State<HomePage> {
         teams = teamsData;
         isLoading = false;
       });
-    } catch (e) {
-      print('Failed to load data: $e');
-
+    } else {
       if (!mounted) return;
 
       setState(() {
@@ -56,6 +80,17 @@ class _HomePageState extends State<HomePage> {
         automaticallyImplyLeading: false,
         backgroundColor: const Color.fromARGB(255, 49, 0, 128),
         title: const Text('Home'),
+        actions: [
+          IconButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Notifications(),
+                    ));
+              },
+              icon: Icon(Icons.notifications_active_sharp))
+        ],
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -73,7 +108,10 @@ class _HomePageState extends State<HomePage> {
                         padding: EdgeInsets.all(90.0),
                         child: Text(
                           'No Teams Joined Yet',
-                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.black),
+                          style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
                         ),
                       )
                     : SizedBox(
@@ -82,13 +120,21 @@ class _HomePageState extends State<HomePage> {
                           itemCount: teams.length,
                           itemBuilder: (context, index, realIndex) {
                             final team = teams[index];
-                            String teamName = team['name']?.toString() ?? 'No Team Name';
+                            String teamName =
+                                team['teamName']?.toString() ?? 'No Team Name';
+                            String teamId = team['teamId']?.toString() ?? '';
+
                             return TeamCard(
                               teamName: teamName,
                               onTap: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => TeamDetailPage(team: team, teamId: '',)),
+                                  MaterialPageRoute(
+                                    builder: (context) => TeamDetailPage(
+                                      teamId: teamId,
+                                      team: team,
+                                    ),
+                                  ),
                                 );
                               },
                             );

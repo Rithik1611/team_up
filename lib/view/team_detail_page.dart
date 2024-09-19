@@ -4,8 +4,10 @@ import 'package:team_up/db/sembast_service.dart'; // Ensure you have the correct
 
 class TeamDetailPage extends StatefulWidget {
   final String teamId;
+  final Map<String, dynamic> team;
 
-  const TeamDetailPage({Key? key, required this.teamId, required team}) : super(key: key);
+  const TeamDetailPage({Key? key, required this.teamId, required this.team})
+      : super(key: key);
 
   @override
   _TeamDetailPageState createState() => _TeamDetailPageState();
@@ -24,31 +26,27 @@ class _TeamDetailPageState extends State<TeamDetailPage> {
   }
 
   Future<void> fetchTeamDetails() async {
-    // Retrieve token
     final token = await _sembastService.getToken();
 
-    // Prepare Dio request options
     final options = Options(
       headers: token != null ? {'Authorization': 'Bearer $token'} : {},
     );
-
-    // Perform the GET request
+    print(widget.teamId);
     final response = await _dio.get(
-      'https://kcgteamupserver-production.up.railway.app/api/team/getUserTeams/${widget.teamId}',
+      'https://kcgteamupserver-production.up.railway.app/api/team/getTeamDetails/${widget.teamId}',
       options: options,
     );
+    print(response);
 
-    // Check response status
     if (response.statusCode == 200) {
       setState(() {
         team = response.data;
         isLoading = false;
       });
     } else {
-      // Handle errors based on the status code
       setState(() {
         isLoading = false;
-        team = {}; // Set team to an empty map or null if appropriate
+        team = {};
       });
       print('Failed to load team details: ${response.statusCode}');
     }
@@ -58,7 +56,7 @@ class _TeamDetailPageState extends State<TeamDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(team?['teamName'] ?? 'Team Details'),
+        title: Text(widget.team['teamName'] ?? 'Team Details'),
         backgroundColor: const Color.fromARGB(255, 49, 0, 128),
       ),
       body: isLoading

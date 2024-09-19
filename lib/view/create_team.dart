@@ -64,6 +64,7 @@ class _TeamInfoPageState extends State<TeamInfoPage> {
           },
         ),
       );
+      print(response);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         // Extract teamId from the response data

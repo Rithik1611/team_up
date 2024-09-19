@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // For date formatting
+import 'package:team_up/db/sembast_service.dart'; // Ensure you have imported this
 import 'package:url_launcher/url_launcher.dart'; // For launching URLs
 
 class EventDetailPage extends StatefulWidget {
@@ -16,6 +17,9 @@ class _EventDetailPageState extends State<EventDetailPage> {
   Map<String, dynamic>? eventData;
   bool isLoading = true;
 
+  final SembastService sembastService =
+      SembastService(); // Instance of SembastService
+
   @override
   void initState() {
     super.initState();
@@ -23,42 +27,35 @@ class _EventDetailPageState extends State<EventDetailPage> {
   }
 
   Future<void> fetchEventData() async {
+    String? token = await sembastService.getToken(); // Get the token
     Dio dio = Dio();
-    try {
-      final response = await dio.get(
-          'https://66e6c57517055714e58a7cc9.mockapi.io/api/v1/event-page/${widget.eventId}');
-      
-      if (!mounted) return;
 
-      setState(() {
-        eventData = response.data;
-        isLoading = false;
-      });
-    } catch (e) {
-      print('Failed to load event details: $e');
+    final response = await dio.get(
+      'https://kcgteamupserver-production.up.railway.app/api/event/${widget.eventId}',
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $token', // Add the token to the headers
+        },
+      ),
+    );
+    print(response);
 
-      if (!mounted) return;
+    if (!mounted) return;
 
-      setState(() {
-        isLoading = false;
-      });
-    }
+    setState(() {
+      eventData = response.data;
+      isLoading = false;
+    });
   }
 
-  // Converts eventDate from "ddMMyyyy" format to a readable date
-  String formatDate(int eventDate) {
-    // Convert the integer date to string, then format it to dd/MM/yyyy
-    String dateStr = eventDate.toString(); // Convert to string
-    // Ensure the date is exactly 8 digits (for example: 17092024)
-    if (dateStr.length == 8) {
-      String day = dateStr.substring(0, 2);
-      String month = dateStr.substring(2, 4);
-      String year = dateStr.substring(4, 8);
-      // Combine the parts into a proper date string (yyyy-MM-dd)
-      String formattedStr = "$year-$month-$day";
-      DateTime parsedDate = DateTime.parse(formattedStr); // Parse the string to DateTime
-      return DateFormat.yMMMd().format(parsedDate); // Format to readable format, e.g., Sep 17, 2024
-    } else {
+  // Converts eventDate from "dd/MM/yyyy" format to a readable date
+  String formatDate(String eventDate) {
+    // Ensure the date is in the correct format
+    try {
+      DateTime parsedDate = DateFormat('dd/MM/yyyy').parse(eventDate);
+      return DateFormat.yMMMd()
+          .format(parsedDate); // Format to readable format, e.g., Sep 17, 2024
+    } catch (e) {
       return "Invalid Date"; // Return error text if format is wrong
     }
   }
@@ -92,9 +89,10 @@ class _EventDetailPageState extends State<EventDetailPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Display Event Image (with fallback if image is empty)
-                        eventData!['image'] != null && eventData!['image'].isNotEmpty
+                        eventData!['eventPoster'] != null &&
+                                eventData!['eventPoster'].isNotEmpty
                             ? Image.network(
-                                eventData!['image'],
+                                eventData!['eventPoster'],
                                 height: 250,
                                 width: double.infinity,
                                 fit: BoxFit.cover,
@@ -135,7 +133,8 @@ class _EventDetailPageState extends State<EventDetailPage> {
                         if (eventData!['eventDate'] != null)
                           Row(
                             children: [
-                              const Icon(Icons.calendar_today, color: Colors.grey, size: 18),
+                              const Icon(Icons.calendar_today,
+                                  color: Colors.grey, size: 18),
                               const SizedBox(width: 5),
                               Text(
                                 'Date: ${formatDate(eventData!['eventDate'])}',
@@ -150,7 +149,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
 
                         // Display Event Description
                         Text(
-                          eventData!['description'] ?? 'No Description',
+                          eventData!['eventDes'] ?? 'No Description',
                           style: const TextStyle(fontSize: 16),
                         ),
                         const SizedBox(height: 20),

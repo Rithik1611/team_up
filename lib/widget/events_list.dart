@@ -20,12 +20,14 @@ class EventsList extends StatelessWidget {
             itemCount: events.length,
             itemBuilder: (context, index) {
               final event = events[index];
-              String eventName = event['eventName']?.toString() ?? 'No Event Name';
+              String eventName =
+                  event['eventName']?.toString() ?? 'No Event Name';
               String date = event['eventDate']?.toString() ?? 'No Date';
-              String imageUrl = event['image']?.toString() ?? '';
+              String imageUrl = event['eventPoster']?.toString() ?? '';
 
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8),
                 child: GestureDetector(
                   onTap: () {
                     String eventId = event['id']?.toString() ?? '';
@@ -56,7 +58,9 @@ class EventsList extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Image.network(
-                            imageUrl.isNotEmpty ? imageUrl : 'https://via.placeholder.com/100',
+                            imageUrl.isNotEmpty
+                                ? imageUrl
+                                : 'https://via.placeholder.com/100',
                             width: 50,
                             height: 50,
                             fit: BoxFit.cover,
@@ -78,12 +82,14 @@ class EventsList extends StatelessWidget {
                             children: [
                               Text(
                                 eventName,
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: 4),
                               Row(
                                 children: [
-                                  const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
+                                  const Icon(Icons.calendar_today,
+                                      size: 16, color: Colors.grey),
                                   const SizedBox(width: 4),
                                   Text(date),
                                 ],
