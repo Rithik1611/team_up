@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:team_up/view/event_detail_page.dart';
+import 'package:intl/intl.dart'; // Import intl package
 
 class EventsList extends StatelessWidget {
   final List events;
@@ -22,7 +23,21 @@ class EventsList extends StatelessWidget {
               final event = events[index];
               String eventName =
                   event['eventName']?.toString() ?? 'No Event Name';
-              String date = event['eventDate']?.toString() ?? 'No Date';
+              String eventDate = event['eventDate']?.toString() ?? '';
+              
+              // Parse and format the date
+              String formattedDate = '';
+              if (eventDate.isNotEmpty) {
+                try {
+                  DateTime parsedDate = DateTime.parse(eventDate);
+                  formattedDate = DateFormat('dd-MM-yyyy').format(parsedDate);
+                } catch (e) {
+                  formattedDate = 'Invalid Date';
+                }
+              } else {
+                formattedDate = 'No Date';
+              }
+
               String imageUrl = event['eventPoster']?.toString() ?? '';
 
               return Padding(
@@ -91,7 +106,7 @@ class EventsList extends StatelessWidget {
                                   const Icon(Icons.calendar_today,
                                       size: 16, color: Colors.grey),
                                   const SizedBox(width: 4),
-                                  Text(date),
+                                  Text(formattedDate),
                                 ],
                               ),
                             ],
