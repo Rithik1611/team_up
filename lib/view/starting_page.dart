@@ -2,12 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:team_up/view/signup_page.dart';
 
-void main() => runApp(
-      const MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: StartingPage(),
-      ),
-    );
 
 class StartingPage extends StatefulWidget {
   const StartingPage({super.key});
@@ -106,7 +100,7 @@ class _StartingPageState extends State<StartingPage> {
                     ),
                     const SizedBox(height: 20), // Optional: Add some space between the button and the text
                     const Text(
-                      'developed by SRK',
+                      'Developed by Sibil Antony, Rithik, kishore, Ashwin sundar, Vijayraj .',
                       style: TextStyle(
                         fontSize: 12, // Adjust the font size as needed
                         color: Colors.white, // Adjust the color as needed
