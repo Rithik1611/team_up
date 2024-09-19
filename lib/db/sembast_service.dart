@@ -43,6 +43,14 @@ class SembastService {
     return token;
   }
 
+  Future<bool> isTokenValid() async {
+    final token = await getToken();
+    if (token == null) return false;
+
+    // Here we just return true without making an API call.
+    return true;
+  }
+
   // Store message data into the Sembast database
   Future<void> storeMessage(Map<String, dynamic> message) async {
     await _initDb();
