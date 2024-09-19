@@ -74,10 +74,11 @@ class AuthModel {
       // Listen for 'inviteNotification' event
       socket!.on('inviteNotification', (data) async {
         print('Invite notification received: $data');
-
+        print('data: $data');
         // Store the message in Sembast database as a map
         await _sembastService.storeMessage({
           'message': data['message'],
+          'teamName': data['teamName'],
           'teamId': data['teamId'],
           'inviteDate': data['inviteDate'],
         });

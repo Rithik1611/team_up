@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:team_up/view/social_media_page.dart';
-import 'package:team_up/view/leader_board_page.dart';
 import 'package:team_up/view/honour_score_page.dart';
+import 'package:team_up/view/leader_board_page.dart';
+import 'package:team_up/view/social_media.dart';
 import 'package:team_up/widget/reports_tile.dart';
 
 class ReportsSection extends StatelessWidget {
@@ -24,7 +24,6 @@ class ReportsSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 10),
-
         const SizedBox(height: 10),
         ReportTile(
           icon: Icons.link,
@@ -33,16 +32,18 @@ class ReportsSection extends StatelessWidget {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => SocialMediaPage()),
+              MaterialPageRoute(
+                builder: (context) => SocialMedia(),
+              ),
             );
           },
         ),
         const SizedBox(height: 10),
-
         ReportTile(
           icon: Icons.verified_user,
           title: 'Leader-Board Rank',
-          subtitle: 'Rank this month- #7\nRank last month- #5\nPersonal Best- #2',
+          subtitle:
+              'Rank this month- #7\nRank last month- #5\nPersonal Best- #2',
           onTap: () {
             Navigator.push(
               context,
@@ -51,11 +52,11 @@ class ReportsSection extends StatelessWidget {
           },
         ),
         const SizedBox(height: 10),
-
         ReportTile(
           icon: Icons.favorite,
           title: 'Honour Score',
-          subtitle: 'This Score allows people to rate you for teamwork and ethics.',
+          subtitle:
+              'This Score allows people to rate you for teamwork and ethics.',
           onTap: () {
             Navigator.push(
               context,

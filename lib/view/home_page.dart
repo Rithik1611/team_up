@@ -43,6 +43,7 @@ class _HomePageState extends State<HomePage> {
         },
       ),
     );
+    print(teamsResponse);
 
     final eventsResponse = await dio.get(
       'https://kcgteamupserver-production.up.railway.app/api/event/all',

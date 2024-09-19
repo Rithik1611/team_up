@@ -28,8 +28,8 @@ class _NotificationsState extends State<Notifications> {
 
   // Fetch messages from the Sembast database
   Future<void> _fetchMessages() async {
-    final messages = await _sembastService
-        .getAllMessages(); // This returns a List<Map<String, dynamic>>
+    final messages = await _sembastService.getAllMessages();
+    print("db message $messages");
     setState(() {
       _messages = messages;
     });
@@ -70,18 +70,24 @@ class _NotificationsState extends State<Notifications> {
   }
 
   // Function to handle the accept action
-  Future<void> _handleAccept(String teamId, String teamName) async {
+  Future<void> _handleAccept(String teamId, String teamName, int index) async {
     final body = {
       'teamId': teamId,
       'teamName': teamName,
       'status': 'accept',
     };
+    print(body);
 
     await _postRequest('/user/invite/decision', body);
+
+    // Remove the message from the list
+    setState(() {
+      _messages.removeAt(index);
+    });
   }
 
   // Function to handle the reject action
-  Future<void> _handleReject(String teamId, String teamName) async {
+  Future<void> _handleReject(String teamId, String teamName, int index) async {
     final body = {
       'teamId': teamId,
       'teamName': teamName,
@@ -89,6 +95,11 @@ class _NotificationsState extends State<Notifications> {
     };
 
     await _postRequest('/user/invite/decision', body);
+
+    // Remove the message from the list
+    setState(() {
+      _messages.removeAt(index);
+    });
   }
 
   @override
@@ -131,14 +142,14 @@ class _NotificationsState extends State<Notifications> {
                             children: [
                               GestureDetector(
                                 onTap: () {
-                                  _handleAccept(teamId, teamName);
+                                  _handleAccept(teamId, teamName, index);
                                 },
                                 child: Icon(Icons.check, color: Colors.green),
                               ),
                               SizedBox(width: 16), // Space between the icons
                               GestureDetector(
                                 onTap: () {
-                                  _handleReject(teamId, teamName);
+                                  _handleReject(teamId, teamName, index);
                                 },
                                 child: Icon(Icons.close, color: Colors.red),
                               ),
