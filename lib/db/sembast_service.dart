@@ -5,6 +5,8 @@ import 'package:sembast/sembast_io.dart';
 class SembastService {
   late Database _db;
   bool _isDbInitialized = false;
+  final _messageStore =
+      intMapStoreFactory.store('messages'); // Store for messages
 
   // Initialize the database if not already initialized
   Future<void> _initDb() async {
@@ -39,5 +41,29 @@ class SembastService {
     final token = await store.record('token').get(_db) as String?;
     print('Retrieved token: $token');
     return token;
+  }
+
+  Future<bool> isTokenValid() async {
+    final token = await getToken();
+    if (token == null) return false;
+
+    // Here we just return true without making an API call.
+    return true;
+  }
+
+  // Store message data into the Sembast database
+  Future<void> storeMessage(Map<String, dynamic> message) async {
+    await _initDb();
+    await _messageStore.add(_db, message);
+    print('Message stored: $message');
+  }
+
+  // Inside the SembastService class
+  Future<List<Map<String, dynamic>>> getAllMessages() async {
+    await _initDb();
+    final records = await _messageStore.find(_db);
+    return records
+        .map((record) => record.value as Map<String, dynamic>)
+        .toList();
   }
 }

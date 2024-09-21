@@ -2,12 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:team_up/view/signup_page.dart';
 
-void main() => runApp(
-      const MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: StartingPage(),
-      ),
-    );
 
 class StartingPage extends StatefulWidget {
   const StartingPage({super.key});
@@ -74,30 +68,45 @@ class _StartingPageState extends State<StartingPage> {
               const Spacer(), // This will push the button to the bottom
               FadeIn(
                 duration: const Duration(milliseconds: 1000),
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SignupPage(),
+                child: Column(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SignupPage(),
+                          ),
+                        );
+                        // Add your onPressed code here!
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.black,
+                        backgroundColor: Colors.white, // Text color
+                        minimumSize: const Size(300, 60), // Width and height
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          // Width and height
+                        ),
                       ),
-                    );
-                    // Add your onPressed code here!
-                  },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.black,
-                    backgroundColor: Colors.white, // Text color
-                    minimumSize: const Size(300, 60), // Width and height
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      // Width and height
+                      child: const Text(
+                        'GET STARTED',
+                        style: TextStyle(
+                          color: Color.fromRGBO(0, 0, 0, 1),
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                  ),
-                  child: const Text('GET STARTED', style: TextStyle(
-                    color: Color.fromRGBO(0, 0, 0, 1),
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),),
+                    const SizedBox(height: 20), // Optional: Add some space between the button and the text
+                    const Text(
+                      'Developed by Sibil Antony, Rithik, kishore, Ashwin sundar, Vijayraj .',
+                      style: TextStyle(
+                        fontSize: 12, // Adjust the font size as needed
+                        color: Colors.white, // Adjust the color as needed
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

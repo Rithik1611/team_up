@@ -1,6 +1,11 @@
+import 'dart:io'; // For File type
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:team_up/models/auth_remote.dart';
-import 'package:team_up/widget/gradient_background.dart'; // Import the GradientBackground widget
+import 'package:team_up/models/student.dart';
+import 'package:team_up/view/main_screen.dart';
+import 'package:team_up/widget/gradient_background.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -12,9 +17,11 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   String _email = '';
   String _password = '';
-  bool _isPasswordVisible = false; // Toggle visibility for password
+  bool _isPasswordVisible = false;
 
   final AuthViewModel _authViewModel = AuthViewModel();
+  final Dio _dio = Dio();
+  Student? _student; // Variable to store the Student details
 
   Future<void> _login() async {
     bool isSuccess = await _authViewModel.login(
@@ -26,8 +33,45 @@ class _LoginPageState extends State<LoginPage> {
       await Future.delayed(const Duration(milliseconds: 500));
       final token = await _authViewModel.getToken();
       print('Token after login: $token');
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Login successful')),
+      );
+
+      // Perform GET request using Dio
+      Response response = await _dio.get(
+        "https://kcgteamupserver-production.up.railway.app/api/user/currentUser",
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token', // Add token to the headers
+          },
+        ),
+      );
+
+      // Parse the response data to extract relevant fields
+      final data = response.data;
+      print(data);
+
+      // Assuming profilePic is a URL or path, here you can handle downloading/loading the image
+      // For now, profilePic is set to null or you can download it if you have a valid URL
+      _student = Student(
+        name: data['name'],
+        year: data['year'],
+        department: data['department'],
+        section: data['section'],
+        skills: List<String>.from(data['skills']),
+        interests: List<String>.from(data['interests']),
+        profilePic:
+            data['profilePic'] != null ? File(data['profilePic']) : null,
+      );
+
+      print('Student details stored: $_student');
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MainScreen(student: _student!),
+        ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -38,9 +82,9 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return GradientBackground( // Wrap the entire page with GradientBackground
+    return GradientBackground(
       child: Scaffold(
-        backgroundColor: Colors.transparent, // Ensure transparency so the gradient is visible
+        backgroundColor: Colors.transparent,
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -50,16 +94,16 @@ class _LoginPageState extends State<LoginPage> {
               const Text(
                 'WELCOME BACK.',
                 style: TextStyle(
-                  fontSize: 32, 
-                  color: Colors.white, // Change the color to white
+                  fontSize: 32,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 32),
               TextField(
-                style: const TextStyle(color: Colors.white), // Input text color to white
+                style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   labelText: 'Email',
-                  labelStyle: const TextStyle(color: Colors.white), // Label color set to white
+                  labelStyle: const TextStyle(color: Colors.white),
                   filled: true,
                   fillColor: Colors.white10,
                   border: OutlineInputBorder(
@@ -74,10 +118,10 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 10),
               TextField(
-                style: const TextStyle(color: Colors.white), // Input text color to white
+                style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   labelText: 'Password',
-                  labelStyle: const TextStyle(color: Colors.white), // Label color set to white
+                  labelStyle: const TextStyle(color: Colors.white),
                   filled: true,
                   fillColor: Colors.white10,
                   border: OutlineInputBorder(
@@ -88,7 +132,7 @@ class _LoginPageState extends State<LoginPage> {
                       _isPasswordVisible
                           ? Icons.visibility
                           : Icons.visibility_off,
-                      color: Colors.white, // Toggle icon color set to white
+                      color: Colors.white,
                     ),
                     onPressed: () {
                       setState(() {
@@ -117,7 +161,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: const Text(
                   'LOG IN',
                   style: TextStyle(
-                    color: Colors.white, 
+                    color: Colors.white,
                     fontSize: 16,
                   ),
                 ),

@@ -43,7 +43,8 @@ class _TeamInfoPageState extends State<TeamInfoPage> {
     if (token == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: const Text('Failed to retrieve token. Please log in again.')),
+            content:
+                const Text('Failed to retrieve token. Please log in again.')),
       );
       return; // Exit the function if the token is null
     }
@@ -63,6 +64,7 @@ class _TeamInfoPageState extends State<TeamInfoPage> {
           },
         ),
       );
+      print(response);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         // Extract teamId from the response data
@@ -82,6 +84,7 @@ class _TeamInfoPageState extends State<TeamInfoPage> {
                   teamName: teamName, // Pass team name
                   teamDescription: teamDescription, // Pass team description
                   teamId: teamId!, // Pass the retrieved teamId
+                  teamSize: _selectedTeamSize!, // Pass the selected team size
                 ),
               ),
             );
@@ -188,14 +191,17 @@ class _TeamInfoPageState extends State<TeamInfoPage> {
 class MembersSearch extends StatefulWidget {
   final Student student;
   final String teamName;
-  final String teamDescription; // Accept the student object from ProfilePage
+  final String teamDescription;
   final String teamId;
+  final int teamSize; // Add this
 
-  MembersSearch(
-      {required this.student,
-      required this.teamName,
-      required this.teamDescription,
-      required this.teamId});
+  MembersSearch({
+    required this.student,
+    required this.teamName,
+    required this.teamDescription,
+    required this.teamId,
+    required this.teamSize, // Add this
+  });
 
   @override
   _MembersSearchState createState() => _MembersSearchState();
@@ -214,6 +220,7 @@ class _MembersSearchState extends State<MembersSearch> {
   final SembastService sembastService = SembastService();
   late Student _student;
   late String _teamId;
+  late int _teamSize; // Add this
 
   // Use the student data from ProfilePage for myProfile
   late final Map<String, dynamic> myProfile;
@@ -223,8 +230,8 @@ class _MembersSearchState extends State<MembersSearch> {
     super.initState();
     initializeTokenAndFetchMembers();
     _teamId = widget.teamId;
-
     _student = widget.student;
+    _teamSize = widget.teamSize; // Initialize teamSize
 
     myProfile = {
       'name': widget.student.name,
@@ -292,8 +299,8 @@ class _MembersSearchState extends State<MembersSearch> {
       if (selectedMembers.contains(member)) {
         selectedMembers.remove(member); // Unselect member
       } else {
-        if (selectedMembers.length < 5) {
-          // Adjust to max 5 since you are already included
+        if (selectedMembers.length < _teamSize - 1) {
+          // Adjust based on teamSize
           selectedMembers.add(member); // Select member
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -425,7 +432,8 @@ class _MembersSearchState extends State<MembersSearch> {
               padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(
                 onPressed: navigateToCreateTeam,
-                child: Text('Create Team (${selectedMembers.length + 1}/6)'),
+                child: Text(
+                    'Create Team (${selectedMembers.length + 1}/$_teamSize)'),
               ),
             ),
         ],

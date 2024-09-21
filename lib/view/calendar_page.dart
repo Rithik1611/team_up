@@ -1,6 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:dio/dio.dart';
+import 'package:intl/intl.dart'; // For date formatting and parsing
+import 'package:team_up/db/sembast_service.dart';
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({super.key});
@@ -13,8 +15,10 @@ class _CalendarPageState extends State<CalendarPage> {
   Map<DateTime, List<String>> _events = {};
   List<String> _selectedEvents = [];
   bool isLoading = true;
-  DateTime _focusedDay = DateTime.now(); // Initialize the focused day
-  DateTime _selectedDay = DateTime.now(); // Initialize the selected day
+  DateTime _focusedDay = DateTime.now();
+  DateTime _selectedDay = DateTime.now();
+
+  final SembastService sembastService = SembastService(); // Create an instance of SembastService
 
   @override
   void initState() {
@@ -24,49 +28,45 @@ class _CalendarPageState extends State<CalendarPage> {
 
   Future<void> fetchEvents() async {
     Dio dio = Dio();
-    try {
-      final response = await dio.get('https://66e6c57517055714e58a7cc9.mockapi.io/api/v1/events');
-      setState(() {
-        _events.clear();
-        for (var event in response.data) {
-          String eventDateStr = event['eventDate'].toString();
-          DateTime eventDate;
+    final token = await sembastService.getToken();
 
-          // Handle DDMMYYYY format
-          if (eventDateStr.length == 8) {
-            int day = int.parse(eventDateStr.substring(0, 2));
-            int month = int.parse(eventDateStr.substring(2, 4));
-            int year = int.parse(eventDateStr.substring(4, 8));
-            eventDate = DateTime(year, month, day);
-          } 
-          // Handle Unix timestamp format (seconds since epoch)
-          else if (eventDateStr.length >= 10) {
-            int timestamp = int.parse(eventDateStr);
-            eventDate = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
-          } 
-          // Default to current date if format is unknown
-          else {
-            eventDate = DateTime.now();
-          }
+    final response = await dio.get(
+      'https://kcgteamupserver-production.up.railway.app/api/event/all',
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      ),
+    );
+
+    setState(() {
+      _events.clear();
+      for (var event in response.data) {
+        String eventDateStr = event['eventDate'].toString();
+        DateTime eventDate;
+
+        try {
+          // Parse the eventDate string into DateTime object
+          eventDate = DateTime.parse(eventDateStr);
+
+          // Format the parsed date to 'dd-MM-yyyy'
+          String formattedDate = DateFormat('dd-MM-yyyy').format(eventDate);
+          print(formattedDate); // This will print the date in dd-MM-yyyy format
 
           // Normalize the date to remove time components
-          DateTime normalizedDate = DateTime(eventDate.year, eventDate.month, eventDate.day);
+          DateTime normalizedDate = _normalizeDate(eventDate);
 
           if (_events[normalizedDate] == null) {
             _events[normalizedDate] = [];
           }
-          _events[normalizedDate]?.add(event['eventName']);
+          _events[normalizedDate]?.add('${event['eventName']} - $formattedDate');
+        } catch (e) {
+          print('Error parsing date: $e');
         }
-        // Set the events for the initially selected day
-        _selectedEvents = _events[_normalizeDate(_selectedDay)] ?? [];
-        isLoading = false;
-      });
-    } catch (e) {
-      print('Error fetching events: $e');
-      setState(() {
-        isLoading = false;
-      });
-    }
+      }
+      _selectedEvents = _events[_normalizeDate(_selectedDay)] ?? [];
+      isLoading = false;
+    });
   }
 
   DateTime _normalizeDate(DateTime date) {
@@ -85,21 +85,23 @@ class _CalendarPageState extends State<CalendarPage> {
           : Column(
               children: [
                 TableCalendar(
-                  focusedDay: _focusedDay, // Pass the focused day
-                  firstDay: DateTime.utc(2000, 1, 1), // Set the first day
-                  lastDay: DateTime.utc(2100, 12, 31), // Set the last day
-                  selectedDayPredicate: (day) {
-                    return isSameDay(_selectedDay, day); // Highlight the selected day
-                  },
+                  focusedDay: _focusedDay,
+                  firstDay: DateTime.utc(2000, 1, 1),
+                  lastDay: DateTime.utc(2100, 12, 31),
+                  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
                   onDaySelected: (selectedDay, focusedDay) {
                     setState(() {
                       _selectedDay = selectedDay;
-                      _focusedDay = focusedDay; // Update focused day
+                      _focusedDay = focusedDay;
                       _selectedEvents = _events[_normalizeDate(selectedDay)] ?? [];
                     });
                   },
                   eventLoader: (day) {
-                    return _events[day] ?? [];
+                    // Return events only for the selected day
+                    return _events[_normalizeDate(day)] ?? [];
+                  },
+                  availableCalendarFormats: const {
+                    CalendarFormat.month: 'Month',
                   },
                   calendarBuilders: CalendarBuilders(
                     markerBuilder: (context, day, events) {
@@ -115,14 +117,16 @@ class _CalendarPageState extends State<CalendarPage> {
                   ),
                 ),
                 Expanded(
-                  child: ListView.builder(
-                    itemCount: _selectedEvents.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(_selectedEvents[index]),
-                      );
-                    },
-                  ),
+                  child: _selectedEvents.isEmpty
+                      ? const Center(child: Text('No events for this day'))
+                      : ListView.builder(
+                          itemCount: _selectedEvents.length,
+                          itemBuilder: (context, index) {
+                            return ListTile(
+                              title: Text(_selectedEvents[index]),
+                            );
+                          },
+                        ),
                 ),
               ],
             ),
@@ -133,7 +137,7 @@ class _CalendarPageState extends State<CalendarPage> {
     return Container(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Colors.blue,
+        color: const Color.fromARGB(171, 232, 125, 223),
       ),
       width: 16.0,
       height: 16.0,
